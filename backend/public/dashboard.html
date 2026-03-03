@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | WanderLog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { urbanist: ['Urbanist', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        .btn { @apply inline-block min-h-[38px] bg-pink-500 border text-white rounded-[42px] border-pink-500 px-5 py-2 transition-all duration-300 hover:bg-pink-600 hover:border-pink-600 text-base !leading-tight font-medium cursor-pointer }
+        .btn.shade-purple { @apply bg-[#636BAB] hover:bg-[#636BAB]/90 hover:border-[#636BAB]/90 text-white border-[#636BAB] }
+        .btn.slate { @apply bg-slate-800 hover:bg-slate-700 text-white border-slate-600 }
+        .stat-card { @apply bg-white rounded-2xl p-6 shadow-sm border border-slate-100 }
+        .nav-link { @apply text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 }
+        .nav-link.active { @apply bg-gradient-to-r from-[#EFD3D7]/60 to-[#DEE2FF]/60 text-slate-800 font-semibold }
+    </style>
+</head>
+<body class="font-urbanist bg-[#f8f7ff]">
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-slate-100 fixed h-full z-50 shadow-sm">
+        <div class="px-6 py-6 border-b border-slate-100">
+            <a href="index.html" class="font-black text-xl text-slate-800 tracking-tight">🌍 WanderLog</a>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-1">
+            <a href="dashboard.html" class="nav-link active">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Dashboard
+            </a>
+            <a href="explore.html" class="nav-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                Explore Countries
+            </a>
+            <a href="my-trips.html" class="nav-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                My Trips
+            </a>
+            <a href="profile.html" class="nav-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Profile
+            </a>
+        </nav>
+        <div class="px-4 py-4 border-t border-slate-100">
+            <div class="flex items-center gap-3 px-3 py-2">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#EFD3D7] to-[#CBC0D3] flex items-center justify-center text-sm font-bold text-white">A</div>
+                <div>
+                    <div class="text-sm font-semibold text-slate-800">Alex Johnson</div>
+                    <div class="text-xs text-slate-500">alex@email.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 lg:ml-64">
+        <!-- Top bar -->
+        <header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+            <div>
+                <h1 class="text-xl font-black text-slate-800">Dashboard</h1>
+                <p class="text-sm text-slate-500">Welcome back, Alex 👋</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="add-trip.html" class="btn shade-purple text-sm px-4 py-2">+ New Trip</a>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#EFD3D7] to-[#CBC0D3] flex items-center justify-center text-sm font-bold text-white cursor-pointer">A</div>
+            </div>
+        </header>
+
+        <main class="p-6">
+            <!-- Background blobs -->
+            <div class="fixed top-20 right-20 w-72 h-72 bg-indigo-200/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="fixed bottom-10 left-72 w-72 h-72 bg-pink-200/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="stat-card">
+                    <div class="text-3xl font-black text-slate-800 mb-1">12</div>
+                    <div class="text-sm text-slate-500">Total Trips</div>
+                    <div class="mt-2 text-xs text-green-600 font-medium">↑ 2 this year</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-3xl font-black text-slate-800 mb-1">28</div>
+                    <div class="text-sm text-slate-500">Countries Visited</div>
+                    <div class="mt-2 text-xs text-green-600 font-medium">↑ 3 new</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-3xl font-black text-slate-800 mb-1">4</div>
+                    <div class="text-sm text-slate-500">Planned Trips</div>
+                    <div class="mt-2 text-xs text-blue-600 font-medium">Next: Japan 🇯🇵</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-3xl font-black text-slate-800 mb-1">47</div>
+                    <div class="text-sm text-slate-500">Reviews Written</div>
+                    <div class="mt-2 text-xs text-purple-600 font-medium">↑ 5 this month</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Chart -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="font-bold text-slate-800">Trips by Region</h2>
+                            <p class="text-sm text-slate-500">Your travel distribution</p>
+                        </div>
+                        <select class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 focus:outline-none">
+                            <option>All time</option>
+                            <option>This year</option>
+                        </select>
+                    </div>
+                    <!-- Bar chart mockup -->
+                    <div class="flex items-end gap-3 h-44">
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-[#636BAB] to-[#8E9AAF] rounded-t-lg" style="height:80%"></div>
+                            <span class="text-xs text-slate-500">Europe</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-[#EFD3D7] to-[#e8a8b0] rounded-t-lg" style="height:55%"></div>
+                            <span class="text-xs text-slate-500">Asia</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-[#CBC0D3] to-[#b0a0c0] rounded-t-lg" style="height:40%"></div>
+                            <span class="text-xs text-slate-500">Americas</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-[#DEE2FF] to-[#b8c0ff] rounded-t-lg" style="height:25%"></div>
+                            <span class="text-xs text-slate-500">Africa</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-[#EFD3D7] to-[#f9c4cc] rounded-t-lg" style="height:15%"></div>
+                            <span class="text-xs text-slate-500">Oceania</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-[#636BAB] to-[#9BA3E8] rounded-t-lg" style="height:10%"></div>
+                            <span class="text-xs text-slate-500">Middle East</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming trips -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <h2 class="font-bold text-slate-800 mb-4">Upcoming Trips</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-[#DEE2FF]/30">
+                            <div class="text-2xl">🇯🇵</div>
+                            <div>
+                                <div class="font-semibold text-sm text-slate-800">Japan</div>
+                                <div class="text-xs text-slate-500">Mar 15 – Mar 28</div>
+                            </div>
+                            <span class="ml-auto text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Planned</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-[#EFD3D7]/30">
+                            <div class="text-2xl">🇵🇹</div>
+                            <div>
+                                <div class="font-semibold text-sm text-slate-800">Portugal</div>
+                                <div class="text-xs text-slate-500">May 2 – May 10</div>
+                            </div>
+                            <span class="ml-auto text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Planned</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-[#CBC0D3]/20">
+                            <div class="text-2xl">🇲🇽</div>
+                            <div>
+                                <div class="font-semibold text-sm text-slate-800">Mexico</div>
+                                <div class="text-xs text-slate-500">Jul 20 – Aug 2</div>
+                            </div>
+                            <span class="ml-auto text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Planned</span>
+                        </div>
+                    </div>
+                    <a href="my-trips.html" class="mt-4 block text-center text-sm text-[#636BAB] font-medium hover:underline">View all trips →</a>
+                </div>
+            </div>
+
+            <!-- Recent trips -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-bold text-slate-800">Recent Trips</h2>
+                    <a href="my-trips.html" class="text-sm text-[#636BAB] font-medium hover:underline">View all</a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="rounded-xl overflow-hidden border border-slate-100 hover:shadow-md transition-shadow">
+                        <div class="h-32 bg-gradient-to-br from-[#EFD3D7] to-[#CBC0D3] relative flex items-center justify-center text-5xl">🇬🇷</div>
+                        <div class="p-4">
+                            <div class="font-semibold text-slate-800">Greece</div>
+                            <div class="text-xs text-slate-500 mb-2">Aug 10 – Aug 22, 2024</div>
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Completed</span>
+                        </div>
+                    </div>
+                    <div class="rounded-xl overflow-hidden border border-slate-100 hover:shadow-md transition-shadow">
+                        <div class="h-32 bg-gradient-to-br from-[#DEE2FF] to-[#636BAB]/40 relative flex items-center justify-center text-5xl">🇮🇹</div>
+                        <div class="p-4">
+                            <div class="font-semibold text-slate-800">Italy</div>
+                            <div class="text-xs text-slate-500 mb-2">Jun 5 – Jun 15, 2024</div>
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Completed</span>
+                        </div>
+                    </div>
+                    <div class="rounded-xl overflow-hidden border border-slate-100 hover:shadow-md transition-shadow">
+                        <div class="h-32 bg-gradient-to-br from-[#CBC0D3] to-[#EFD3D7] relative flex items-center justify-center text-5xl">🇯🇵</div>
+                        <div class="p-4">
+                            <div class="font-semibold text-slate-800">Japan</div>
+                            <div class="text-xs text-slate-500 mb-2">Mar 15 – Mar 28, 2025</div>
+                            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Planned</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

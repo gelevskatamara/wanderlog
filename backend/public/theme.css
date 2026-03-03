@@ -1,0 +1,69 @@
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes spin-border {
+to { --angle: 360deg; }
+}
+
+.spinning-border {
+    animation: spin-border 3s linear infinite;
+    border: 2px solid transparent;
+    background:
+        linear-gradient(white, white) padding-box,
+        conic-gradient(
+        from var(--angle),
+        #e8e8e8 0%,
+        #e8e8e8 50%,
+        rgba(216, 106, 212, 0.6),
+        rgba(151,110,221,0.7),
+        rgba(162,110,220,0.55),
+        #e8e8e8 72%,
+        #e8e8e8 100%
+    ) border-box;
+}
+
+@keyframes wipe {
+    0%   { background-position: 100% center; }
+    100% { background-position: -100% center; }
+}
+
+.highlight::before {
+    background: linear-gradient(
+        90deg,
+        transparent        0%,
+        rgba(94,234,212,0.2)  30%,
+        rgba(167,139,250,0.3) 60%,
+        transparent        100%
+    );
+    background-size: 300% auto;
+    animation: wipe 5s linear infinite;
+}
+
+
+
+.draw-path {
+    stroke-dashoffset: 1;
+    animation: draw 3s ease-in-out forwards;
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+
+  #drawPath {
+        stroke-width: 8px;
+        stroke-dasharray: 6949.734375 6949.734375;
+        stroke-dashoffset: 6949.734375;
+    }
+    @media (min-width: 640px) {
+        #drawPath { stroke-width: 14px; }
+    }
+    @media (min-width: 768px) {
+        #drawPath { stroke-width: 25px; }
+    }
