@@ -59,3 +59,5 @@ export const updateUserRole = (id, d) => API.put(`/admin/users/${id}`, d);
 export const deleteUser = (id) => API.delete(`/admin/users/${id}`);
 
 export default API;
+
+export const getCountryPhoto = (name) => API.get(`/images/country/${encodeURIComponent(name)}`);

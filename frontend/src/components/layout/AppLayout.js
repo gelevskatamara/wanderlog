@@ -2,9 +2,10 @@ import Sidebar from './Sidebar';
 
 export default function AppLayout({ children }) {
   return (
-    <div style={{display:'flex',minHeight:'100vh',background:'#f8f7ff',fontFamily:"'Urbanist', sans-serif"}}>
+    <div className="app-layout">
       <Sidebar />
-      <div style={{flex:1,marginLeft:'256px'}}>
+      {/* Offset for desktop sidebar, offset for mobile top bar */}
+      <div className="app-content pt-14 lg:pt-0">
         {children}
       </div>
     </div>

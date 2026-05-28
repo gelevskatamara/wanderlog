@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/layout/PageHeader';
+import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import FormInput from '../components/common/FormInput';
+import FormTextarea from '../components/common/FormTextarea';
+import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { SuccessIcon } from '../components/common/Icons';
+import { PopulationIcon, AreaIcon, DriveIcon, PhoneIcon, BuildingIcon, CurrencyIcon, LanguageIcon, TimeIcon, WeatherIcon } from '../components/common/Icons';
 import { getCountry, getWeather, createTrip } from '../services/api';
+import useCountryPhoto from '../hooks/useCountryPhoto';
 import { useAuth } from '../context/AuthContext';
 
 export default function CountryDetailPage() {
@@ -20,6 +26,7 @@ export default function CountryDetailPage() {
   const [tripError, setTripError] = useState('');
   const [tripSaving, setTripSaving] = useState(false);
   const [tripSuccess, setTripSuccess] = useState(false);
+  const { photo: countryPhoto } = useCountryPhoto(country?.name);
 
   useEffect(() => {
     getCountry(decodeURIComponent(name))
@@ -42,100 +49,182 @@ export default function CountryDetailPage() {
     try {
       await createTrip({ ...tripForm, destination: country.name });
       setTripSuccess(true);
-      setTimeout(() => { setTripModal(false); setTripSuccess(false); setTripForm({ title:'',startDate:'',endDate:'',description:'' }); }, 1500);
+      setTimeout(() => {
+        setTripModal(false);
+        setTripSuccess(false);
+        setTripForm({ title: '', startDate: '', endDate: '', description: '' });
+      }, 1500);
     } catch (err) {
       setTripError(err.response?.data?.message || 'Failed to create trip');
     } finally { setTripSaving(false); }
   };
 
   if (loading) return <AppLayout><LoadingSpinner /></AppLayout>;
-  if (!country) return <AppLayout><div style={{padding:'60px',textAlign:'center',color:'#94a3b8'}}>Country not found</div></AppLayout>;
+  if (!country) return (
+    <AppLayout>
+      <PageWrapper>
+        <div className="text-center py-20 text-slate-400">Country not found</div>
+      </PageWrapper>
+    </AppLayout>
+  );
+
+  const facts = [
+    { icon: <PopulationIcon className="w-5 h-5" />, label: 'Population', value: country.population ? (country.population / 1e6).toFixed(1) + 'M' : 'N/A' },
+    { icon: <AreaIcon className="w-5 h-5" />, label: 'Area',       value: country.area ? country.area.toLocaleString() + ' km²' : 'N/A' },
+    { icon: <DriveIcon className="w-5 h-5" />, label: 'Drive Side', value: country.drivingSide || 'N/A' },
+    { icon: <PhoneIcon className="w-5 h-5" />, label: 'Calling',    value: country.callingCodes?.[0] || 'N/A' },
+  ];
 
   return (
     <AppLayout>
-      <PageHeader title={`${country.flag || '🌍'} ${country.name}`} subtitle={`${country.region} · ${country.subregion || ''}`}
-        action={user?.role !== 'guest' ? <Button onClick={() => setTripModal(true)}>+ Plan a Trip</Button> : null} />
-      <main style={{padding:'24px'}}>
-        {/* Hero */}
-        <div style={{background:'linear-gradient(135deg, #DEE2FF, #CBC0D3, #EFD3D7)',borderRadius:'24px',padding:'32px',marginBottom:'24px',position:'relative',overflow:'hidden'}}>
-          <div style={{position:'absolute',right:'-20px',top:'-20px',fontSize:'160px',opacity:0.1,userSelect:'none'}}>{country.flag}</div>
-          <div style={{position:'relative',zIndex:1}}>
-            <div style={{fontSize:'64px',marginBottom:'12px'}}>{country.flag || '🌍'}</div>
-            <h2 style={{fontSize:'28px',fontWeight:900,color:'#1e293b',margin:'0 0 8px'}}>{country.name}</h2>
-            {country.officialName && <p style={{color:'#64748b',margin:'0 0 16px',fontSize:'14px'}}>Official: {country.officialName}</p>}
-            <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-              {country.capital && <span style={{background:'rgba(255,255,255,0.6)',color:'#374151',padding:'4px 14px',borderRadius:'999px',fontSize:'13px'}}>🏙 {country.capital}</span>}
-              {country.languages?.[0] && <span style={{background:'rgba(255,255,255,0.6)',color:'#374151',padding:'4px 14px',borderRadius:'999px',fontSize:'13px'}}>🗣 {country.languages[0]}</span>}
-              {country.currencies?.[0] && <span style={{background:'rgba(255,255,255,0.6)',color:'#374151',padding:'4px 14px',borderRadius:'999px',fontSize:'13px'}}>💰 {country.currencies[0].code}</span>}
-              {country.timezone && <span style={{background:'rgba(255,255,255,0.6)',color:'#374151',padding:'4px 14px',borderRadius:'999px',fontSize:'13px'}}>🕐 {country.timezone}</span>}
+      <PageHeader
+        title={`${country.flag || '🌍'} ${country.name}`}
+        subtitle={`${country.region}${country.subregion ? ' · ' + country.subregion : ''}`}
+        action={user?.role !== 'guest' && (
+          <Button onClick={() => setTripModal(true)} className="text-sm px-4 py-2">
+            + Plan a Trip
+          </Button>
+        )}
+      />
+      <PageWrapper>
+
+        {/* Hero banner with photo */}
+        <div className="rounded-2xl sm:rounded-3xl overflow-hidden mb-6 relative h-48 sm:h-64 bg-gradient-to-br from-primary-light via-soft-purple to-soft-pink">
+
+          {/* Placeholder — always visible under the photo */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            {country.flagUrl ? (
+              <img src={country.flagUrl} alt="" className="w-32 h-20 object-cover rounded-xl shadow-lg opacity-40" />
+            ) : (
+              <span className="text-8xl opacity-30">{country.flag || '🌍'}</span>
+            )}
+          </div>
+
+          {/* Real photo fades in on top */}
+          {countryPhoto?.url && (
+            <img src={countryPhoto.url} alt="" className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700" />
+          )}
+
+          {/* Loading shimmer */}
+          {!countryPhoto && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
+          )}
+
+          {/* Gradient overlay so text is always readable */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+          {/* Flag badge top-right */}
+          <div className="absolute top-4 right-4 z-10">
+            {country.flagUrl ? (
+              <div className="w-12 h-8 rounded-md shadow-lg overflow-hidden border-2 border-white/40">
+                <img src={country.flagUrl} alt="" className="w-full h-full object-cover" />
+              </div>
+            ) : country.flag ? (
+              <span className="text-3xl drop-shadow-lg">{country.flag}</span>
+            ) : null}
+          </div>
+
+          {/* Country info bottom-left */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 z-10">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2 drop-shadow">{country.name}</h2>
+            <div className="flex flex-wrap gap-2">
+              {country.capital && (
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/20">🏙 {country.capital}</span>
+              )}
+              {country.languages?.[0] && (
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/20">🗣 {country.languages[0]}</span>
+              )}
+              {country.currencies?.[0] && (
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/20">💰 {country.currencies[0].code}</span>
+              )}
+              {country.timezone && (
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/20">🕐 {country.timezone}</span>
+              )}
             </div>
           </div>
         </div>
 
-        <div style={{display:'flex',flexWrap:'wrap',gap:'20px'}}>
+        <div className="flex flex-wrap gap-4 sm:gap-6">
+
           {/* Key facts */}
-          <div style={{flex:'2 1 400px',background:'white',borderRadius:'20px',padding:'24px',border:'1px solid #e2e8f0'}}>
-            <h3 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:'0 0 16px'}}>Key Facts</h3>
-            <div style={{display:'flex',flexWrap:'wrap',gap:'12px'}}>
-              {[
-                { label:'Population', value: country.population ? (country.population/1e6).toFixed(1)+'M' : 'N/A', icon:'👥' },
-                { label:'Area', value: country.area ? country.area.toLocaleString()+' km²' : 'N/A', icon:'📐' },
-                { label:'Drive Side', value: country.drivingSide || 'N/A', icon:'🚗' },
-                { label:'Calling Code', value: country.callingCodes?.[0] || 'N/A', icon:'📞' },
-              ].map(f => (
-                <div key={f.label} style={{flex:'1 1 120px',textAlign:'center',padding:'14px',background:'#f8f7ff',borderRadius:'14px'}}>
-                  <div style={{fontSize:'22px',marginBottom:'6px'}}>{f.icon}</div>
-                  <div style={{fontWeight:700,color:'#1e293b',fontSize:'14px'}}>{f.value}</div>
-                  <div style={{fontSize:'11px',color:'#94a3b8',marginTop:'2px'}}>{f.label}</div>
+          <div className="card p-4 sm:p-6 flex-1 basis-full lg:basis-[400px]">
+            <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-4">Key Facts</h3>
+            <div className="flex flex-wrap gap-3">
+              {facts.map(f => (
+                <div key={f.label} className="flex-1 basis-28 text-center p-3 sm:p-4 bg-soft-blue rounded-xl">
+                  <div className="flex justify-center mb-2 text-primary">{f.icon}</div>
+                  <div className="font-bold text-slate-800 text-sm">{f.value}</div>
+                  <div className="text-xs text-slate-400 mt-1">{f.label}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Weather widget */}
-          <div style={{flex:'1 1 220px',background:'linear-gradient(135deg, rgba(222,226,255,0.5), rgba(203,192,211,0.3))',borderRadius:'20px',padding:'24px',border:'1px solid #e2e8f0'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
-              <h3 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:0}}>Live Weather</h3>
-              <span style={{fontSize:'12px',color:'#94a3b8'}}>{country.capital}</span>
+          <div className="card p-4 sm:p-6 flex-1 basis-full sm:basis-60">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm sm:text-base font-bold text-slate-800">Live Weather</h3>
+              <span className="text-xs text-slate-400">{country.capital}</span>
             </div>
             {weather ? (
-              <div style={{textAlign:'center'}}>
-                <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} alt="weather" style={{width:'64px',height:'64px'}} />
-                <div style={{fontSize:'36px',fontWeight:900,color:'#1e293b'}}>{weather.temp}°C</div>
-                <div style={{fontSize:'13px',color:'#64748b',textTransform:'capitalize'}}>{weather.description}</div>
-                <div style={{display:'flex',justifyContent:'center',gap:'16px',marginTop:'12px',fontSize:'12px',color:'#94a3b8'}}>
+              <div className="text-center">
+                <img
+                  src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                  alt="weather icon"
+                  className="w-16 h-16 mx-auto"
+                />
+                <div className="text-4xl font-black text-slate-800">{weather.temp}°C</div>
+                <div className="text-sm text-slate-500 capitalize mt-1">{weather.description}</div>
+                <div className="flex justify-center gap-4 mt-3 text-xs text-slate-400">
                   <span>💧 {weather.humidity}%</span>
                   <span>💨 {weather.windSpeed} m/s</span>
                 </div>
-                <div style={{fontSize:'11px',color:'#cbd5e1',marginTop:'8px'}}>OpenWeatherMap API</div>
+                <p className="text-xs text-slate-300 mt-3">OpenWeatherMap API</p>
               </div>
             ) : (
-              <div style={{textAlign:'center',color:'#94a3b8',padding:'20px 0',fontSize:'14px'}}>Weather unavailable</div>
+              <div className="text-center py-8 text-slate-400 text-sm">
+                <div className="flex justify-center mb-2 text-primary"><WeatherIcon className="w-8 h-8" /></div>
+                Weather unavailable
+              </div>
             )}
           </div>
+
         </div>
-      </main>
+      </PageWrapper>
 
       {/* Plan Trip Modal */}
       <Modal isOpen={tripModal} onClose={() => setTripModal(false)} title={`Plan a Trip to ${country.name} ${country.flag}`}>
         {tripSuccess ? (
-          <div style={{textAlign:'center',padding:'20px',color:'#059669',fontSize:'16px',fontWeight:600}}>✅ Trip created successfully!</div>
+          <div className="text-center py-8">
+            <div className="flex justify-center mb-3 text-emerald-500"><SuccessIcon className="w-12 h-12" /></div>
+            <p className="text-emerald-600 font-semibold">Trip created successfully!</p>
+          </div>
         ) : (
           <form onSubmit={handleTripSubmit}>
-            {tripError && <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'10px',padding:'10px',color:'#dc2626',fontSize:'13px',marginBottom:'14px'}}>{tripError}</div>}
-            <FormInput label="Trip Title" name="title" type="text" placeholder="e.g. Tokyo Cherry Blossom Trip" value={tripForm.title} onChange={e => setTripForm(p => ({...p, title: e.target.value}))} required />
-            <div style={{display:'flex',gap:'12px'}}>
-              <div style={{flex:1}}><FormInput label="Start Date" name="startDate" type="date" value={tripForm.startDate} onChange={e => setTripForm(p => ({...p, startDate: e.target.value}))} required /></div>
-              <div style={{flex:1}}><FormInput label="End Date" name="endDate" type="date" value={tripForm.endDate} onChange={e => setTripForm(p => ({...p, endDate: e.target.value}))} required /></div>
+            <Alert type="error" message={tripError} />
+            <FormInput
+              label="Trip Title" name="title" type="text"
+              placeholder="e.g. Tokyo Cherry Blossom Trip"
+              value={tripForm.title}
+              onChange={e => setTripForm(p => ({ ...p, title: e.target.value }))}
+              required
+            />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <FormInput label="Start Date" name="startDate" type="date" value={tripForm.startDate} onChange={e => setTripForm(p => ({ ...p, startDate: e.target.value }))} required />
+              </div>
+              <div className="flex-1">
+                <FormInput label="End Date" name="endDate" type="date" value={tripForm.endDate} onChange={e => setTripForm(p => ({ ...p, endDate: e.target.value }))} required />
+              </div>
             </div>
-            <div style={{marginBottom:'16px'}}>
-              <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#374151',marginBottom:'6px'}}>Notes</label>
-              <textarea rows={3} placeholder="What are you excited about?" value={tripForm.description} onChange={e => setTripForm(p => ({...p, description: e.target.value}))}
-                style={{width:'100%',padding:'10px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'14px',outline:'none',resize:'none',boxSizing:'border-box',fontFamily:"'Urbanist',sans-serif"}} />
-            </div>
-            <div style={{display:'flex',gap:'10px'}}>
-              <Button type="button" variant="ghost" onClick={() => setTripModal(false)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Cancel</Button>
-              <Button type="submit" loading={tripSaving} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Save Trip</Button>
+            <FormTextarea
+              label="Notes" rows={3} placeholder="What are you excited about?"
+              value={tripForm.description} maxLength={500}
+              onChange={e => setTripForm(p => ({ ...p, description: e.target.value }))}
+            />
+            <div className="flex gap-3 mt-2">
+              <Button type="button" variant="ghost" onClick={() => setTripModal(false)} className="flex-1">Cancel</Button>
+              <Button type="submit" loading={tripSaving} className="flex-1">Save Trip</Button>
             </div>
           </form>
         )}

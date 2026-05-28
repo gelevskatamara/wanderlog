@@ -1,48 +1,58 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/layout/PageHeader';
+import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
 import TripCard from '../components/common/TripCard';
 import Modal from '../components/common/Modal';
 import FormInput from '../components/common/FormInput';
+import FormSelect from '../components/common/FormSelect';
+import FormTextarea from '../components/common/FormTextarea';
+import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { getTrips, createTrip, deleteTrip } from '../services/api';
+import EmptyState from '../components/common/EmptyState';
+import { SearchIcon, TripsIcon } from '../components/common/Icons';
 import { useAuth } from '../context/AuthContext';
+import { getTrips, createTrip, deleteTrip } from '../services/api';
 
 const TABS = ['all', 'planned', 'ongoing', 'completed'];
 
 const validate = (v) => {
   const e = {};
   if (!v.title || v.title.length < 3) e.title = 'Title must be at least 3 characters';
-  if (!v.destination || !/^[a-zA-Z\s]{2,}$/.test(v.destination)) e.destination = 'Valid country name required';
+  if (!v.destination || !/^[a-zA-Z\s]{2,}$/.test(v.destination)) e.destination = 'Valid country name required (letters only)';
   if (!v.startDate) e.startDate = 'Required';
   if (!v.endDate) e.endDate = 'Required';
   if (v.startDate && v.endDate && v.endDate < v.startDate) e.endDate = 'Must be after start date';
   return e;
 };
 
+const emptyForm = { title: '', destination: '', startDate: '', endDate: '', description: '', status: 'planned' };
+
 export default function MyTripsPage() {
+  const { user } = useAuth();
   const [trips, setTrips] = useState([]);
   const [tab, setTab] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
-  const [form, setForm] = useState({ title:'', destination:'', startDate:'', endDate:'', description:'', status:'planned' });
+  const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [apiError, setApiError] = useState('');
-  const { user } = useAuth();
 
-  const fetch = () => {
+  const fetchTrips = useCallback(() => {
     setLoading(true);
     const params = {};
     if (tab !== 'all') params.status = tab;
     if (search) params.search = search;
-    getTrips(params).then(res => setTrips(res.data.trips)).catch(console.error).finally(() => setLoading(false));
-  };
+    getTrips(params)
+      .then(res => setTrips(res.data.trips))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [tab, search]);
 
-  useEffect(() => { fetch(); }, [tab, search]);
+  useEffect(() => { fetchTrips(); }, [fetchTrips]);
 
   const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -55,8 +65,8 @@ export default function MyTripsPage() {
     try {
       await createTrip(form);
       setModal(false);
-      setForm({ title:'', destination:'', startDate:'', endDate:'', description:'', status:'planned' });
-      fetch();
+      setForm(emptyForm);
+      fetchTrips();
     } catch (err) {
       setApiError(err.response?.data?.message || 'Failed to create trip');
     } finally { setSaving(false); }
@@ -64,83 +74,102 @@ export default function MyTripsPage() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this trip?')) return;
-    try { await deleteTrip(id); fetch(); } catch (err) { alert(err.response?.data?.message || 'Delete failed'); }
+    try { await deleteTrip(id); fetchTrips(); }
+    catch (err) { alert(err.response?.data?.message || 'Delete failed'); }
   };
+
+  const openModal = () => { setForm(emptyForm); setErrors({}); setApiError(''); setModal(true); };
 
   return (
     <AppLayout>
-      <PageHeader title="My Trips" subtitle={`${trips.length} trips`}
-        action={user?.role !== 'guest' ? <Button onClick={() => setModal(true)}>+ New Trip</Button> : null} />
-      <main style={{padding:'24px'}}>
+      <PageHeader
+        title="My Trips"
+        subtitle={`${trips.length} trip${trips.length !== 1 ? 's' : ''}`}
+        action={user?.role !== 'guest' && (
+          <Button onClick={openModal} className="text-sm px-4 py-2">+ New Trip</Button>
+        )}
+      />
+      <PageWrapper>
+
         {/* Filters */}
-        <div style={{background:'white',borderRadius:'20px',padding:'16px 20px',border:'1px solid #e2e8f0',marginBottom:'24px',display:'flex',flexWrap:'wrap',alignItems:'center',justifyContent:'space-between',gap:'12px'}}>
-          <div style={{display:'flex',gap:'4px'}}>
+        <div className="card p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          {/* Tabs */}
+          <div className="flex gap-1 flex-wrap">
             {TABS.map(t => (
-              <button key={t} onClick={() => setTab(t)}
-                style={{padding:'8px 16px',borderRadius:'10px',border:'none',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:"'Urbanist',sans-serif",transition:'all 0.2s',
-                  background: tab===t ? '#636BAB' : 'transparent', color: tab===t ? 'white' : '#94a3b8'}}>
-                {t.charAt(0).toUpperCase()+t.slice(1)}
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                  tab === t ? 'bg-primary text-white' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
             ))}
           </div>
-          <input value={search} onChange={e => { setSearch(e.target.value); }} placeholder="Search trips..."
-            style={{padding:'8px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'13px',outline:'none',width:'200px',fontFamily:"'Urbanist',sans-serif"}} />
+          {/* Search */}
+          <div className="relative w-full sm:w-48">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><SearchIcon className="w-3.5 h-3.5" /></span>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search trips..."
+              className="form-input pl-8 text-sm py-2"
+            />
+          </div>
         </div>
 
         {loading ? <LoadingSpinner /> : (
-          <div style={{display:'flex',flexWrap:'wrap',gap:'20px'}}>
+          <div className="flex flex-wrap gap-4">
             {trips.map(t => (
-              <div key={t._id} style={{flex:'1 1 280px',maxWidth:'360px'}}>
-                <TripCard trip={t} onDelete={handleDelete} />
+              <div key={t._id} className="w-full min-[480px]:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)]">
+                <TripCard trip={t} onDelete={user?.role !== 'guest' ? handleDelete : null} />
               </div>
             ))}
+
             {trips.length === 0 && (
-              <div style={{width:'100%',textAlign:'center',padding:'60px',color:'#94a3b8'}}>
-                <div style={{fontSize:'48px',marginBottom:'12px'}}>✈️</div>
-                <p>No trips found.</p>
-                <Button onClick={() => setModal(true)}>Plan your first trip</Button>
+              <div className="w-full">
+                <EmptyState icon={<TripsIcon className="w-12 h-12" />} title="No trips found" message="Start planning your next adventure." action={user?.role !== 'guest' ? 'Plan a Trip' : null} onAction={openModal} />
               </div>
             )}
+
             {/* Add card */}
             {user?.role !== 'guest' && (
-              <div onClick={() => setModal(true)}
-                style={{flex:'1 1 280px',maxWidth:'360px',minHeight:'200px',border:'2px dashed #e2e8f0',borderRadius:'20px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'#94a3b8',transition:'all 0.2s',gap:'8px'}}
-                onMouseEnter={e => { e.currentTarget.style.borderColor='#636BAB'; e.currentTarget.style.color='#636BAB'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor='#e2e8f0'; e.currentTarget.style.color='#94a3b8'; }}>
-                <span style={{fontSize:'36px'}}>✈️</span>
-                <span style={{fontWeight:600,fontSize:'14px'}}>Plan a New Trip</span>
+              <div
+                onClick={openModal}
+                className="w-full min-[480px]:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] min-h-[180px] border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer text-slate-300 hover:border-primary hover:text-primary transition-all duration-200"
+              >
+                <span className="text-primary"><TripsIcon className="w-8 h-8" /></span>
+                <span className="text-sm font-semibold">Plan a New Trip</span>
               </div>
             )}
           </div>
         )}
-      </main>
+      </PageWrapper>
 
-      <Modal isOpen={modal} onClose={() => { setModal(false); setErrors({}); setApiError(''); }} title="New Trip ✈️">
+      {/* New Trip Modal */}
+      <Modal isOpen={modal} onClose={() => setModal(false)} title="New Trip ✈️">
         <form onSubmit={handleSubmit}>
-          {apiError && <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'10px',padding:'10px',color:'#dc2626',fontSize:'13px',marginBottom:'14px'}}>{apiError}</div>}
+          <Alert type="error" message={apiError} />
           <FormInput label="Trip Title" name="title" type="text" placeholder="e.g. Bali Summer Escape" value={form.title} onChange={handleChange} error={errors.title} required />
           <FormInput label="Destination Country" name="destination" type="text" placeholder="e.g. Indonesia" value={form.destination} onChange={handleChange} error={errors.destination} required />
-          <div style={{display:'flex',gap:'12px'}}>
-            <div style={{flex:1}}><FormInput label="Start Date" name="startDate" type="date" value={form.startDate} onChange={handleChange} error={errors.startDate} required /></div>
-            <div style={{flex:1}}><FormInput label="End Date" name="endDate" type="date" value={form.endDate} onChange={handleChange} error={errors.endDate} required /></div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <FormInput label="Start Date" name="startDate" type="date" value={form.startDate} onChange={handleChange} error={errors.startDate} required />
+            </div>
+            <div className="flex-1">
+              <FormInput label="End Date" name="endDate" type="date" value={form.endDate} onChange={handleChange} error={errors.endDate} required />
+            </div>
           </div>
-          <div style={{marginBottom:'16px'}}>
-            <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#374151',marginBottom:'6px'}}>Status</label>
-            <select name="status" value={form.status} onChange={handleChange}
-              style={{width:'100%',padding:'10px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'14px',outline:'none',fontFamily:"'Urbanist',sans-serif"}}>
-              <option value="planned">Planned</option>
-              <option value="ongoing">Ongoing</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-          <div style={{marginBottom:'16px'}}>
-            <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#374151',marginBottom:'6px'}}>Description</label>
-            <textarea rows={3} name="description" placeholder="What are you excited about?" value={form.description} onChange={handleChange}
-              style={{width:'100%',padding:'10px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'14px',outline:'none',resize:'none',boxSizing:'border-box',fontFamily:"'Urbanist',sans-serif"}} />
-          </div>
-          <div style={{display:'flex',gap:'10px'}}>
-            <Button type="button" variant="ghost" onClick={() => setModal(false)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Cancel</Button>
-            <Button type="submit" loading={saving} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Save Trip</Button>
+          <FormSelect label="Status" name="status" value={form.status} onChange={handleChange}>
+            <option value="planned">Planned</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="completed">Completed</option>
+          </FormSelect>
+          <FormTextarea label="Description" name="description" rows={3} placeholder="What are you excited about?" value={form.description} maxLength={500} onChange={handleChange} />
+          <div className="flex gap-3 mt-2">
+            <Button type="button" variant="ghost" onClick={() => setModal(false)} className="flex-1">Cancel</Button>
+            <Button type="submit" loading={saving} className="flex-1">Save Trip</Button>
           </div>
         </form>
       </Modal>

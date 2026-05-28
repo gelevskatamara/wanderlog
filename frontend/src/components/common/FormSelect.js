@@ -1,4 +1,4 @@
-export default function FormInput({ label, error, required, className = '', ...props }) {
+export default function FormSelect({ label, error, required, children, className = '', ...props }) {
   return (
     <div className="mb-4">
       {label && (
@@ -7,10 +7,12 @@ export default function FormInput({ label, error, required, className = '', ...p
           {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
-      <input
+      <select
         {...props}
-        className={`form-input ${error ? 'border-red-400 focus:border-red-400' : ''} ${className}`}
-      />
+        className={`form-input bg-white ${error ? 'border-red-400' : ''} ${className}`}
+      >
+        {children}
+      </select>
       {error && <p className="form-error">{error}</p>}
     </div>
   );

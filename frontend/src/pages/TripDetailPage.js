@@ -2,13 +2,33 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/layout/PageHeader';
+import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import FormInput from '../components/common/FormInput';
+import FormSelect from '../components/common/FormSelect';
+import FormTextarea from '../components/common/FormTextarea';
+import Alert from '../components/common/Alert';
 import StatusBadge from '../components/common/StatusBadge';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { TripsIcon, EditIcon, DeleteIcon, StarIcon, SuccessIcon, WarningIcon } from '../components/common/Icons';
 import { getTrip, deleteTrip, updateTrip, getTripReviews, createReview, deleteReview } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+
+const StarRating = ({ value, onChange }) => (
+  <div className="flex gap-1 mb-4">
+    {[1, 2, 3, 4, 5].map(s => (
+      <button
+        key={s}
+        type="button"
+        onClick={() => onChange(s)}
+        className={`transition-opacity text-amber-400 ${s <= value ? 'opacity-100' : 'opacity-20'}`}
+      >
+        <StarIcon className="w-7 h-7" />
+      </button>
+    ))}
+  </div>
+);
 
 export default function TripDetailPage() {
   const { id } = useParams();
@@ -29,8 +49,16 @@ export default function TripDetailPage() {
   const load = () => {
     Promise.all([getTrip(id), getTripReviews(id)])
       .then(([tripRes, revRes]) => {
-        setTrip(tripRes.data.trip);
-        setEditForm({ title: tripRes.data.trip.title, destination: tripRes.data.trip.destination, startDate: tripRes.data.trip.startDate?.split('T')[0], endDate: tripRes.data.trip.endDate?.split('T')[0], description: tripRes.data.trip.description, status: tripRes.data.trip.status });
+        const t = tripRes.data.trip;
+        setTrip(t);
+        setEditForm({
+          title: t.title,
+          destination: t.destination,
+          startDate: t.startDate?.split('T')[0],
+          endDate: t.endDate?.split('T')[0],
+          description: t.description,
+          status: t.status,
+        });
         setReviews(revRes.data.reviews);
       })
       .catch(console.error)
@@ -40,13 +68,16 @@ export default function TripDetailPage() {
   useEffect(() => { load(); }, [id]);
 
   const handleDelete = async () => {
-    try { await deleteTrip(id); navigate('/trips'); } catch (err) { alert(err.response?.data?.message || 'Delete failed'); }
+    try { await deleteTrip(id); navigate('/trips'); }
+    catch (err) { alert(err.response?.data?.message || 'Delete failed'); }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setSavingEdit(true);
-    try { await updateTrip(id, editForm); setEditModal(false); load(); } catch (err) { alert(err.response?.data?.message || 'Update failed'); } finally { setSavingEdit(false); }
+    try { await updateTrip(id, editForm); setEditModal(false); load(); }
+    catch (err) { alert(err.response?.data?.message || 'Update failed'); }
+    finally { setSavingEdit(false); }
   };
 
   const handleReviewSubmit = async (e) => {
@@ -54,86 +85,112 @@ export default function TripDetailPage() {
     setReviewError('');
     if (!reviewForm.comment || reviewForm.comment.length < 5) { setReviewError('Comment must be at least 5 characters'); return; }
     setSavingReview(true);
-    try { await createReview({ tripId: id, ...reviewForm }); setReviewModal(false); setReviewForm({ rating: 5, comment: '' }); load(); } catch (err) { setReviewError(err.response?.data?.message || 'Failed'); } finally { setSavingReview(false); }
+    try {
+      await createReview({ tripId: id, ...reviewForm });
+      setReviewModal(false);
+      setReviewForm({ rating: 5, comment: '' });
+      load();
+    } catch (err) { setReviewError(err.response?.data?.message || 'Failed'); }
+    finally { setSavingReview(false); }
   };
 
   const handleDeleteReview = async (rid) => {
     if (!window.confirm('Delete this review?')) return;
-    try { await deleteReview(rid); load(); } catch (err) { alert('Delete failed'); }
+    try { await deleteReview(rid); load(); } catch { alert('Delete failed'); }
   };
 
   if (loading) return <AppLayout><LoadingSpinner /></AppLayout>;
-  if (!trip) return <AppLayout><div style={{padding:'60px',textAlign:'center',color:'#94a3b8'}}>Trip not found</div></AppLayout>;
+  if (!trip) return (
+    <AppLayout>
+      <PageWrapper>
+        <div className="text-center py-20 text-slate-400">Trip not found</div>
+      </PageWrapper>
+    </AppLayout>
+  );
 
-  const isOwner = trip.userId?._id === user?._id || trip.userId === user?._id;
-  const canEdit = isOwner || user?.role === 'admin';
-  const days = Math.ceil((new Date(trip.endDate) - new Date(trip.startDate)) / (1000*60*60*24));
+  const ownerId = trip.userId?._id || trip.userId;
+  const canEdit = ownerId === user?._id || user?.role === 'admin';
+  const days = Math.ceil((new Date(trip.endDate) - new Date(trip.startDate)) / (1000 * 60 * 60 * 24));
 
   return (
     <AppLayout>
-      <PageHeader title={trip.title}
+      <PageHeader
+        title={trip.title}
         subtitle={`${trip.destination} · ${days} days`}
-        action={canEdit ? (
-          <div style={{display:'flex',gap:'8px'}}>
-            <Button variant="secondary" onClick={() => setEditModal(true)}>✏️ Edit</Button>
-            <Button variant="danger" onClick={() => setDeleteModal(true)}>🗑 Delete</Button>
+        action={canEdit && (
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => setEditModal(true)} className="text-sm px-3 py-2 flex items-center gap-1.5"><EditIcon className="w-4 h-4" /> Edit</Button>
+            <Button variant="danger" onClick={() => setDeleteModal(true)} className="text-sm px-3 py-2 flex items-center gap-1.5"><DeleteIcon className="w-4 h-4" /> Delete</Button>
           </div>
-        ) : null} />
-      <main style={{padding:'24px'}}>
+        )}
+      />
+      <PageWrapper>
+
         {/* Hero */}
-        <div style={{background:'linear-gradient(135deg, #DEE2FF, #CBC0D3, #EFD3D7)',borderRadius:'24px',padding:'32px',marginBottom:'24px',position:'relative',overflow:'hidden'}}>
-          <div style={{position:'absolute',right:'-20px',top:'-10px',fontSize:'140px',opacity:0.1,userSelect:'none'}}>✈️</div>
-          <div style={{position:'relative',zIndex:1,display:'flex',flexWrap:'wrap',alignItems:'center',justifyContent:'space-between',gap:'16px'}}>
+        <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-light via-soft-purple to-soft-pink p-6 sm:p-8 mb-6 relative overflow-hidden">
+          <div className="absolute right-4 top-4 text-8xl opacity-10 select-none">✈️</div>
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 style={{fontSize:'24px',fontWeight:900,color:'#1e293b',margin:'0 0 12px'}}>{trip.title}</h2>
-              <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-                <span style={{background:'rgba(255,255,255,0.6)',padding:'4px 14px',borderRadius:'999px',fontSize:'13px',color:'#374151'}}>📅 {new Date(trip.startDate).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} – {new Date(trip.endDate).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
-                <span style={{background:'rgba(255,255,255,0.6)',padding:'4px 14px',borderRadius:'999px',fontSize:'13px',color:'#374151'}}>🗓 {days} days</span>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-3">{trip.title}</h2>
+              <div className="flex flex-wrap gap-2">
+                <span className="bg-white/60 text-slate-700 text-xs px-3 py-1 rounded-full">
+                  📅 {new Date(trip.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} – {new Date(trip.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+                <span className="bg-white/60 text-slate-700 text-xs px-3 py-1 rounded-full">🗓 {days} days</span>
                 <StatusBadge status={trip.status} />
               </div>
             </div>
-            <div style={{fontSize:'56px'}}>✈️</div>
+            <span className="text-5xl sm:text-6xl">✈️</span>
           </div>
         </div>
 
-        <div style={{display:'flex',flexWrap:'wrap',gap:'20px'}}>
-          <div style={{flex:'2 1 400px',display:'flex',flexDirection:'column',gap:'20px'}}>
+        <div className="flex flex-wrap gap-4 sm:gap-6">
+
+          {/* Main content */}
+          <div className="flex flex-col gap-4 sm:gap-6 flex-1 basis-full lg:basis-[400px]">
+
             {/* Description */}
             {trip.description && (
-              <div style={{background:'white',borderRadius:'20px',padding:'24px',border:'1px solid #e2e8f0'}}>
-                <h3 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:'0 0 12px'}}>About this Trip</h3>
-                <p style={{color:'#64748b',lineHeight:1.7,margin:0,fontSize:'14px'}}>{trip.description}</p>
+              <div className="card p-4 sm:p-6">
+                <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-3">About this Trip</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{trip.description}</p>
               </div>
             )}
 
             {/* Reviews */}
-            <div style={{background:'white',borderRadius:'20px',padding:'24px',border:'1px solid #e2e8f0'}}>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}}>
-                <h3 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:0}}>Reviews & Notes</h3>
+            <div className="card p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm sm:text-base font-bold text-slate-800">
+                  Reviews & Notes
+                  {reviews.length > 0 && <span className="ml-2 text-xs text-slate-400 font-normal">({reviews.length})</span>}
+                </h3>
                 {user?.role !== 'guest' && trip.status === 'completed' && (
-                  <button onClick={() => setReviewModal(true)} style={{fontSize:'13px',color:'#636BAB',fontWeight:600,background:'none',border:'none',cursor:'pointer'}}>+ Add Review</button>
+                  <button onClick={() => setReviewModal(true)} className="text-xs text-primary font-semibold hover:underline">
+                    + Add Review
+                  </button>
                 )}
               </div>
+
               {reviews.length === 0 ? (
-                <p style={{color:'#94a3b8',fontSize:'14px',textAlign:'center',padding:'20px 0'}}>No reviews yet.</p>
+                <div className="text-center py-8 text-slate-400 text-sm">No reviews yet.</div>
               ) : (
-                <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+                <div className="flex flex-col gap-3">
                   {reviews.map(r => (
-                    <div key={r._id} style={{background:'#f8f7ff',borderRadius:'14px',padding:'14px'}}>
-                      <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
-                        <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,#EFD3D7,#CBC0D3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:700,color:'white'}}>
+                    <div key={r._id} className="bg-soft-blue rounded-xl p-3 sm:p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-soft-pink to-soft-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                           {r.userId?.name?.[0]?.toUpperCase()}
                         </div>
-                        <div style={{flex:1}}>
-                          <div style={{fontSize:'13px',fontWeight:600,color:'#1e293b'}}>{r.userId?.name}</div>
-                          <div style={{color:'#f59e0b',fontSize:'12px'}}>{'★'.repeat(r.rating)}{'☆'.repeat(5-r.rating)}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-800 truncate">{r.userId?.name}</p>
+                          <p className="text-amber-400 text-xs">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</p>
                         </div>
-                        <span style={{fontSize:'11px',color:'#94a3b8'}}>{new Date(r.createdAt).toLocaleDateString()}</span>
+                        <span className="text-xs text-slate-400 flex-shrink-0">{new Date(r.createdAt).toLocaleDateString()}</span>
                         {(r.userId?._id === user?._id || user?.role === 'admin') && (
-                          <button onClick={() => handleDeleteReview(r._id)} style={{background:'none',border:'none',cursor:'pointer',color:'#94a3b8',fontSize:'14px'}}>🗑</button>
+                          <button onClick={() => handleDeleteReview(r._id)} className="text-slate-300 hover:text-red-400 transition-colors"><DeleteIcon className="w-4 h-4" /></button>
                         )}
                       </div>
-                      <p style={{margin:0,fontSize:'13px',color:'#64748b',lineHeight:1.6}}>{r.comment}</p>
+                      <p className="text-sm text-slate-500 leading-relaxed">{r.comment}</p>
                     </div>
                   ))}
                 </div>
@@ -142,40 +199,34 @@ export default function TripDetailPage() {
           </div>
 
           {/* Sidebar info */}
-          <div style={{flex:'1 1 220px',display:'flex',flexDirection:'column',gap:'16px'}}>
-            <div style={{background:'white',borderRadius:'20px',padding:'20px',border:'1px solid #e2e8f0'}}>
-              <h3 style={{fontSize:'15px',fontWeight:700,color:'#1e293b',margin:'0 0 16px'}}>Trip Info</h3>
-              <div style={{display:'flex',flexDirection:'column',gap:'12px',fontSize:'13px'}}>
-                <div style={{display:'flex',justifyContent:'space-between'}}>
-                  <span style={{color:'#94a3b8'}}>Country</span>
-                  <Link to={`/explore/${encodeURIComponent(trip.destination)}`} style={{fontWeight:600,color:'#636BAB',textDecoration:'none'}}>🌍 {trip.destination}</Link>
+          <div className="card p-4 sm:p-6 flex-1 basis-full sm:basis-64 lg:basis-52 self-start">
+            <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-4">Trip Info</h3>
+            <div className="flex flex-col gap-3 text-sm">
+              {[
+                { label: 'Country', value: <Link to={`/explore/${encodeURIComponent(trip.destination)}`} className="font-semibold text-primary hover:underline">🌍 {trip.destination}</Link> },
+                { label: 'Duration', value: <span className="font-semibold text-slate-800">{days} days</span> },
+                { label: 'Status', value: <StatusBadge status={trip.status} /> },
+                { label: 'Created', value: <span className="font-semibold text-slate-800">{new Date(trip.createdAt).toLocaleDateString()}</span> },
+              ].map(row => (
+                <div key={row.label} className="flex items-center justify-between gap-2">
+                  <span className="text-slate-400 text-xs">{row.label}</span>
+                  {row.value}
                 </div>
-                <div style={{display:'flex',justifyContent:'space-between'}}>
-                  <span style={{color:'#94a3b8'}}>Duration</span>
-                  <span style={{fontWeight:600,color:'#1e293b'}}>{days} days</span>
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between'}}>
-                  <span style={{color:'#94a3b8'}}>Status</span>
-                  <StatusBadge status={trip.status} />
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between'}}>
-                  <span style={{color:'#94a3b8'}}>Created</span>
-                  <span style={{fontWeight:600,color:'#1e293b'}}>{new Date(trip.createdAt).toLocaleDateString()}</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
+
         </div>
-      </main>
+      </PageWrapper>
 
       {/* Delete Modal */}
-      <Modal isOpen={deleteModal} onClose={() => setDeleteModal(false)} title="Delete Trip?" maxWidth="400px">
-        <div style={{textAlign:'center'}}>
-          <div style={{fontSize:'48px',marginBottom:'12px'}}>🗑️</div>
-          <p style={{color:'#64748b',fontSize:'14px',marginBottom:'24px'}}>This will permanently delete "{trip.title}". This cannot be undone.</p>
-          <div style={{display:'flex',gap:'10px'}}>
-            <Button variant="ghost" onClick={() => setDeleteModal(false)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Cancel</Button>
-            <Button variant="danger" onClick={handleDelete} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Delete</Button>
+      <Modal isOpen={deleteModal} onClose={() => setDeleteModal(false)} title="Delete Trip?" maxWidth="max-w-sm">
+        <div className="text-center">
+          <div className="flex justify-center mb-3 text-red-400"><DeleteIcon className="w-12 h-12" /></div>
+          <p className="text-sm text-slate-500 mb-6">This will permanently delete <strong>"{trip.title}"</strong>. This cannot be undone.</p>
+          <div className="flex gap-3">
+            <Button variant="ghost" onClick={() => setDeleteModal(false)} className="flex-1">Cancel</Button>
+            <Button variant="danger" onClick={handleDelete} className="flex-1">Delete</Button>
           </div>
         </div>
       </Modal>
@@ -183,49 +234,46 @@ export default function TripDetailPage() {
       {/* Edit Modal */}
       <Modal isOpen={editModal} onClose={() => setEditModal(false)} title="Edit Trip ✏️">
         <form onSubmit={handleEditSubmit}>
-          <FormInput label="Title" name="title" type="text" value={editForm.title} onChange={e => setEditForm(p => ({...p, title: e.target.value}))} required />
-          <FormInput label="Destination" name="destination" type="text" value={editForm.destination} onChange={e => setEditForm(p => ({...p, destination: e.target.value}))} required />
-          <div style={{display:'flex',gap:'12px'}}>
-            <div style={{flex:1}}><FormInput label="Start Date" name="startDate" type="date" value={editForm.startDate} onChange={e => setEditForm(p => ({...p, startDate: e.target.value}))} /></div>
-            <div style={{flex:1}}><FormInput label="End Date" name="endDate" type="date" value={editForm.endDate} onChange={e => setEditForm(p => ({...p, endDate: e.target.value}))} /></div>
+          <FormInput label="Title" name="title" type="text" value={editForm.title} onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))} required />
+          <FormInput label="Destination" name="destination" type="text" value={editForm.destination} onChange={e => setEditForm(p => ({ ...p, destination: e.target.value }))} required />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <FormInput label="Start Date" name="startDate" type="date" value={editForm.startDate} onChange={e => setEditForm(p => ({ ...p, startDate: e.target.value }))} />
+            </div>
+            <div className="flex-1">
+              <FormInput label="End Date" name="endDate" type="date" value={editForm.endDate} onChange={e => setEditForm(p => ({ ...p, endDate: e.target.value }))} />
+            </div>
           </div>
-          <div style={{marginBottom:'16px'}}>
-            <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#374151',marginBottom:'6px'}}>Status</label>
-            <select name="status" value={editForm.status} onChange={e => setEditForm(p => ({...p, status: e.target.value}))}
-              style={{width:'100%',padding:'10px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'14px',outline:'none',fontFamily:"'Urbanist',sans-serif"}}>
-              <option value="planned">Planned</option>
-              <option value="ongoing">Ongoing</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-          <div style={{display:'flex',gap:'10px'}}>
-            <Button type="button" variant="ghost" onClick={() => setEditModal(false)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Cancel</Button>
-            <Button type="submit" loading={savingEdit} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Save</Button>
+          <FormSelect label="Status" name="status" value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}>
+            <option value="planned">Planned</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="completed">Completed</option>
+          </FormSelect>
+          <FormTextarea label="Description" rows={3} value={editForm.description} maxLength={500} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} />
+          <div className="flex gap-3 mt-2">
+            <Button type="button" variant="ghost" onClick={() => setEditModal(false)} className="flex-1">Cancel</Button>
+            <Button type="submit" loading={savingEdit} className="flex-1">Save</Button>
           </div>
         </form>
       </Modal>
 
       {/* Review Modal */}
-      <Modal isOpen={reviewModal} onClose={() => setReviewModal(false)} title="Write a Review ✍️" maxWidth="440px">
+      <Modal isOpen={reviewModal} onClose={() => setReviewModal(false)} title="Write a Review ✍️" maxWidth="max-w-md">
         <form onSubmit={handleReviewSubmit}>
-          {reviewError && <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'10px',padding:'10px',color:'#dc2626',fontSize:'13px',marginBottom:'14px'}}>{reviewError}</div>}
-          <div style={{marginBottom:'16px'}}>
-            <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#374151',marginBottom:'8px'}}>Rating</label>
-            <div style={{display:'flex',gap:'8px'}}>
-              {[1,2,3,4,5].map(s => (
-                <button key={s} type="button" onClick={() => setReviewForm(p => ({...p, rating: s}))}
-                  style={{fontSize:'28px',background:'none',border:'none',cursor:'pointer',opacity: s <= reviewForm.rating ? 1 : 0.3,transition:'opacity 0.15s'}}>⭐</button>
-              ))}
-            </div>
+          <Alert type="error" message={reviewError} />
+          <div className="mb-4">
+            <label className="form-label">Rating</label>
+            <StarRating value={reviewForm.rating} onChange={r => setReviewForm(p => ({ ...p, rating: r }))} />
           </div>
-          <div style={{marginBottom:'16px'}}>
-            <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#374151',marginBottom:'6px'}}>Your Review</label>
-            <textarea rows={4} placeholder="Share your experience..." value={reviewForm.comment} onChange={e => setReviewForm(p => ({...p, comment: e.target.value}))}
-              style={{width:'100%',padding:'10px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'14px',outline:'none',resize:'none',boxSizing:'border-box',fontFamily:"'Urbanist',sans-serif"}} />
-          </div>
-          <div style={{display:'flex',gap:'10px'}}>
-            <Button type="button" variant="ghost" onClick={() => setReviewModal(false)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Cancel</Button>
-            <Button type="submit" loading={savingReview} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Submit</Button>
+          <FormTextarea
+            label="Your Review" rows={4} placeholder="Share your experience..."
+            value={reviewForm.comment}
+            onChange={e => setReviewForm(p => ({ ...p, comment: e.target.value }))}
+            maxLength={1000}
+          />
+          <div className="flex gap-3 mt-2">
+            <Button type="button" variant="ghost" onClick={() => setReviewModal(false)} className="flex-1">Cancel</Button>
+            <Button type="submit" loading={savingReview} className="flex-1">Submit</Button>
           </div>
         </form>
       </Modal>

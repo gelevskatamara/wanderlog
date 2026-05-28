@@ -32,6 +32,7 @@ app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/weather', require('./routes/weather'));
+app.use('/api/images', require('./routes/images'));
 
 // DB tools (dev only)
 app.use('/db', require('./routes/db'));

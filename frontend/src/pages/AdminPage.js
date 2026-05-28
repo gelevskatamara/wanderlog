@@ -2,157 +2,219 @@ import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/layout/PageHeader';
+import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
 import StatusBadge from '../components/common/StatusBadge';
 import Modal from '../components/common/Modal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { SearchIcon, AdminIcon, WarningIcon } from '../components/common/Icons';
 import { getAdminStats, getAdminUsers, updateUserRole, deleteUser } from '../services/api';
 
 export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
-  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [roleModal, setRoleModal] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  // Initial load
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([getAdminStats(), getAdminUsers({})])
+      .then(([sRes, uRes]) => { setStats(sRes.data.stats); setUsers(uRes.data.users); })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Debounce — wait 500ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(searchInput), 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Search query changed — fetch only users table, not stats
+  useEffect(() => {
+    if (loading) return;
+    setUsersLoading(true);
+    getAdminUsers({ search: searchQuery })
+      .then(res => setUsers(res.data.users))
+      .catch(console.error)
+      .finally(() => setUsersLoading(false));
+  }, [searchQuery]);
+
   const load = () => {
     setLoading(true);
-    Promise.all([getAdminStats(), getAdminUsers({ search })])
+    Promise.all([getAdminStats(), getAdminUsers({ search: searchQuery })])
       .then(([sRes, uRes]) => { setStats(sRes.data.stats); setUsers(uRes.data.users); })
       .catch(console.error)
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [search]);
-
   const handleRoleUpdate = async (id, role) => {
     setSaving(true);
-    try { await updateUserRole(id, { role }); setRoleModal(null); load(); } catch (err) { alert('Failed to update role'); } finally { setSaving(false); }
+    try { await updateUserRole(id, { role }); setRoleModal(null); load(); }
+    catch { alert('Failed to update role'); }
+    finally { setSaving(false); }
   };
 
   const handleDelete = async (id) => {
     setSaving(true);
-    try { await deleteUser(id); setDeleteModal(null); load(); } catch (err) { alert('Failed to delete user'); } finally { setSaving(false); }
+    try { await deleteUser(id); setDeleteModal(null); load(); }
+    catch { alert('Failed to delete user'); }
+    finally { setSaving(false); }
   };
 
   const chartData = (stats?.topDestinations || []).slice(0, 6).map(d => ({ name: d._id, trips: d.count }));
 
-  if (loading) return <AppLayout><LoadingSpinner /></AppLayout>;
-
   const statCards = [
-    { label:'Total Users', value: stats?.totalUsers ?? 0, color:'#636BAB' },
-    { label:'Total Trips', value: stats?.totalTrips ?? 0, color:'#3b82f6' },
-    { label:'Total Reviews', value: stats?.totalReviews ?? 0, color:'#8b5cf6' },
-    { label:'Countries', value: 195, color:'#10b981' },
+    { label: 'Total Users',   value: stats?.totalUsers   ?? 0, color: 'text-primary',     bg: 'bg-primary-light/40' },
+    { label: 'Total Trips',   value: stats?.totalTrips   ?? 0, color: 'text-blue-600',    bg: 'bg-blue-50' },
+    { label: 'Total Reviews', value: stats?.totalReviews ?? 0, color: 'text-violet-600',  bg: 'bg-violet-50' },
+    { label: 'Countries',     value: 195,                       color: 'text-emerald-600', bg: 'bg-emerald-50' },
   ];
 
   return (
     <AppLayout>
-      <PageHeader title="Admin Panel" subtitle="Platform overview and management"
-        action={<span style={{fontSize:'12px',background:'rgba(99,107,171,0.1)',color:'#636BAB',padding:'4px 12px',borderRadius:'999px',fontWeight:600}}>🔐 Admin</span>} />
-      <main style={{padding:'24px'}}>
-        {/* Stats */}
-        <div style={{display:'flex',flexWrap:'wrap',gap:'16px',marginBottom:'24px'}}>
-          {statCards.map(c => (
-            <div key={c.label} style={{flex:'1 1 140px',background:'white',borderRadius:'20px',padding:'20px',border:'1px solid #e2e8f0'}}>
-              <div style={{fontSize:'28px',fontWeight:900,color:c.color}}>{c.value.toLocaleString()}</div>
-              <div style={{fontSize:'13px',color:'#64748b',marginTop:'4px'}}>{c.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{display:'flex',flexWrap:'wrap',gap:'20px',marginBottom:'24px'}}>
-          {/* Chart */}
-          <div style={{flex:'2 1 400px',background:'white',borderRadius:'20px',padding:'24px',border:'1px solid #e2e8f0'}}>
-            <h2 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:'0 0 20px'}}>Top Destinations</h2>
-            {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="name" tick={{fontSize:11,fill:'#94a3b8'}} />
-                  <YAxis tick={{fontSize:11,fill:'#94a3b8'}} allowDecimals={false} />
-                  <Tooltip contentStyle={{borderRadius:'12px',border:'none',boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}} />
-                  <Bar dataKey="trips" fill="#636BAB" radius={[6,6,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div style={{height:'200px',display:'flex',alignItems:'center',justifyContent:'center',color:'#94a3b8',fontSize:'14px'}}>No data yet</div>
-            )}
-          </div>
-
-          {/* Users by role */}
-          <div style={{flex:'1 1 220px',background:'white',borderRadius:'20px',padding:'24px',border:'1px solid #e2e8f0'}}>
-            <h2 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:'0 0 16px'}}>Users by Role</h2>
-            <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
-              {(stats?.usersByRole || []).map(r => (
-                <div key={r._id} style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <StatusBadge status={r._id} />
-                  <span style={{fontWeight:700,color:'#1e293b'}}>{r.count}</span>
+      <PageHeader
+        title="Admin Panel"
+        subtitle="Platform overview and management"
+        action={
+          <span className="badge badge-admin flex items-center gap-1"><AdminIcon className="w-3 h-3" /> Admin</span>
+        }
+      />
+      <PageWrapper>
+        {loading ? <LoadingSpinner /> : (
+          <>
+            {/* Stat cards */}
+            <div className="flex flex-wrap gap-3 sm:gap-4 mb-6">
+              {statCards.map(c => (
+                <div key={c.label} className={`stat-card ${c.bg} border-0`}>
+                  <div className={`text-2xl sm:text-3xl font-black ${c.color}`}>{c.value.toLocaleString()}</div>
+                  <div className="text-xs sm:text-sm text-slate-500 mt-1">{c.label}</div>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
 
-        {/* Users table */}
-        <div style={{background:'white',borderRadius:'20px',border:'1px solid #e2e8f0',overflow:'hidden'}}>
-          <div style={{padding:'20px 24px',borderBottom:'1px solid #e2e8f0',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'12px'}}>
-            <h2 style={{fontSize:'16px',fontWeight:700,color:'#1e293b',margin:0}}>All Users</h2>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search users..."
-              style={{padding:'8px 14px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'13px',outline:'none',width:'200px',fontFamily:"'Urbanist',sans-serif"}} />
-          </div>
-          <div style={{overflowX:'auto'}}>
-            <table style={{width:'100%',borderCollapse:'collapse',fontSize:'13px'}}>
-              <thead>
-                <tr style={{background:'#f8f7ff'}}>
-                  {['User','Role','Joined','Actions'].map(h => (
-                    <th key={h} style={{padding:'10px 16px',textAlign:'left',color:'#94a3b8',fontWeight:600,fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.05em'}}>{h}</th>
+            {/* Chart + roles */}
+            <div className="flex flex-wrap gap-4 sm:gap-6 mb-6">
+              <div className="card p-4 sm:p-6 flex-1 basis-full lg:basis-[400px]">
+                <h2 className="text-sm sm:text-base font-bold text-slate-800 mb-4">Top Destinations</h2>
+                {chartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
+                      <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                      <Bar dataKey="trips" fill="#636BAB" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-48 flex items-center justify-center text-slate-400 text-sm">No data yet</div>
+                )}
+              </div>
+
+              <div className="card p-4 sm:p-6 flex-1 basis-full sm:basis-56">
+                <h2 className="text-sm sm:text-base font-bold text-slate-800 mb-4">Users by Role</h2>
+                <div className="flex flex-col gap-3">
+                  {(stats?.usersByRole || []).map(r => (
+                    <div key={r._id} className="flex items-center justify-between">
+                      <StatusBadge status={r._id} />
+                      <span className="font-bold text-slate-800 text-sm">{r.count}</span>
+                    </div>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {users.map(u => (
-                  <tr key={u._id} style={{borderTop:'1px solid #f1f5f9'}}>
-                    <td style={{padding:'12px 16px'}}>
-                      <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                        <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,#EFD3D7,#CBC0D3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:700,color:'white',flexShrink:0}}>
-                          {u.name?.[0]?.toUpperCase()}
-                        </div>
-                        <div>
-                          <div style={{fontWeight:600,color:'#1e293b'}}>{u.name}</div>
-                          <div style={{color:'#94a3b8',fontSize:'12px'}}>{u.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{padding:'12px 16px'}}><StatusBadge status={u.role} /></td>
-                    <td style={{padding:'12px 16px',color:'#64748b'}}>{new Date(u.createdAt).toLocaleDateString()}</td>
-                    <td style={{padding:'12px 16px'}}>
-                      <div style={{display:'flex',gap:'8px'}}>
-                        <button onClick={() => setRoleModal(u)} style={{fontSize:'12px',color:'#636BAB',fontWeight:600,background:'none',border:'none',cursor:'pointer'}}>Edit Role</button>
-                        <button onClick={() => setDeleteModal(u)} style={{fontSize:'12px',color:'#ef4444',fontWeight:600,background:'none',border:'none',cursor:'pointer'}}>Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {users.length === 0 && <div style={{textAlign:'center',padding:'40px',color:'#94a3b8'}}>No users found</div>}
-          </div>
-        </div>
-      </main>
+                </div>
+              </div>
+            </div>
+
+            {/* Users table */}
+            <div className="card overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <h2 className="text-sm sm:text-base font-bold text-slate-800">All Users</h2>
+                <div className="relative w-full sm:w-52">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><SearchIcon className="w-3.5 h-3.5" /></span>
+                  <input
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
+                    placeholder="Search users..."
+                    className="form-input pl-8 text-sm py-2"
+                  />
+                </div>
+              </div>
+
+              {/* Responsive table — horizontal scroll on mobile */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="bg-soft-blue">
+                      {['User', 'Role', 'Joined', 'Actions'].map(h => (
+                        <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map(u => (
+                      <tr key={u._id} className="border-t border-slate-50 hover:bg-soft-blue/50 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-soft-pink to-soft-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                              {u.name?.[0]?.toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-slate-800 truncate max-w-[120px] sm:max-w-none">{u.name}</p>
+                              <p className="text-xs text-slate-400 truncate max-w-[120px] sm:max-w-none">{u.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap"><StatusBadge status={u.role} /></td>
+                        <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">{new Date(u.createdAt).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex gap-3">
+                            <button onClick={() => setRoleModal(u)} className="text-xs text-primary font-semibold hover:underline">Edit Role</button>
+                            <button onClick={() => setDeleteModal(u)} className="text-xs text-red-400 font-semibold hover:underline">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {usersLoading ? (
+                  <tr><td colSpan={4} className="text-center py-8 text-slate-400 text-sm">Searching...</td></tr>
+                ) : users.length === 0 ? (
+                  <tr><td colSpan={4} className="text-center py-8 text-slate-400 text-sm">No users found</td></tr>
+                ) : null}
+              </div>
+            </div>
+          </>
+        )}
+      </PageWrapper>
 
       {/* Role Modal */}
       {roleModal && (
-        <Modal isOpen={!!roleModal} onClose={() => setRoleModal(null)} title="Change Role" maxWidth="360px">
-          <p style={{color:'#64748b',fontSize:'14px',marginBottom:'16px'}}>Change role for <strong>{roleModal.name}</strong></p>
-          <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-            {['guest','user','admin'].map(r => (
-              <button key={r} onClick={() => handleRoleUpdate(roleModal._id, r)} disabled={saving || roleModal.role === r}
-                style={{padding:'12px',borderRadius:'12px',border:'1px solid',fontSize:'14px',fontWeight:600,cursor:roleModal.role===r?'default':'pointer',fontFamily:"'Urbanist',sans-serif",
-                  background: roleModal.role===r ? '#636BAB' : 'white', color: roleModal.role===r ? 'white' : '#64748b', borderColor: roleModal.role===r ? '#636BAB' : '#e2e8f0'}}>
-                {r.charAt(0).toUpperCase()+r.slice(1)}{roleModal.role===r ? ' (current)' : ''}
+        <Modal isOpen={!!roleModal} onClose={() => setRoleModal(null)} title="Change Role" maxWidth="max-w-xs">
+          <p className="text-sm text-slate-500 mb-4">
+            Change role for <strong>{roleModal.name}</strong>
+          </p>
+          <div className="flex flex-col gap-2">
+            {['guest', 'user', 'admin'].map(r => (
+              <button
+                key={r}
+                onClick={() => handleRoleUpdate(roleModal._id, r)}
+                disabled={saving || roleModal.role === r}
+                className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all duration-200 ${
+                  roleModal.role === r
+                    ? 'bg-primary text-white border-primary cursor-default'
+                    : 'bg-white text-slate-500 border-slate-200 hover:border-primary hover:text-primary'
+                }`}
+              >
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+                {roleModal.role === r && ' (current)'}
               </button>
             ))}
           </div>
@@ -161,13 +223,15 @@ export default function AdminPage() {
 
       {/* Delete Modal */}
       {deleteModal && (
-        <Modal isOpen={!!deleteModal} onClose={() => setDeleteModal(null)} title="Delete User?" maxWidth="380px">
-          <div style={{textAlign:'center'}}>
-            <div style={{fontSize:'48px',marginBottom:'12px'}}>⚠️</div>
-            <p style={{color:'#64748b',fontSize:'14px',marginBottom:'24px'}}>Delete <strong>{deleteModal.name}</strong> and all their data? This cannot be undone.</p>
-            <div style={{display:'flex',gap:'10px'}}>
-              <Button variant="ghost" onClick={() => setDeleteModal(null)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Cancel</Button>
-              <Button variant="danger" loading={saving} onClick={() => handleDelete(deleteModal._id)} style={{flex:1,borderRadius:'12px',padding:'12px'}}>Delete</Button>
+        <Modal isOpen={!!deleteModal} onClose={() => setDeleteModal(null)} title="Delete User?" maxWidth="max-w-sm">
+          <div className="text-center">
+            <div className="flex justify-center mb-3 text-amber-500"><WarningIcon className="w-12 h-12" /></div>
+            <p className="text-sm text-slate-500 mb-6">
+              Delete <strong>{deleteModal.name}</strong> and all their data? This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button variant="ghost" onClick={() => setDeleteModal(null)} className="flex-1">Cancel</Button>
+              <Button variant="danger" loading={saving} onClick={() => handleDelete(deleteModal._id)} className="flex-1">Delete</Button>
             </div>
           </div>
         </Modal>
