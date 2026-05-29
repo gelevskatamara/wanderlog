@@ -30,10 +30,10 @@ const userSchema = new mongoose.Schema({
     default: 'user',
   },
   bio: { type: String, maxlength: 300, default: '' },
+  avatar: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 
-// Hash password before save
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -41,7 +41,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Compare password
 userSchema.methods.matchPassword = async function (entered) {
   return await bcrypt.compare(entered, this.password);
 };

@@ -61,3 +61,16 @@ export const deleteUser = (id) => API.delete(`/admin/users/${id}`);
 export default API;
 
 export const getCountryPhoto = (name) => API.get(`/images/country/${encodeURIComponent(name)}`);
+
+// Trip Photos
+export const getTripPhotos = (tripId) => API.get(`/uploads/trips/${tripId}/photos`);
+export const uploadTripPhoto = (tripId, formData) => API.post(`/uploads/trips/${tripId}/photos`, formData, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const deleteTripPhoto = (photoId) => API.delete(`/uploads/photos/${photoId}`);
+
+// Avatar
+export const uploadAvatar = (formData) => API.post('/uploads/avatar', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const removeAvatar = () => API.delete('/uploads/avatar');

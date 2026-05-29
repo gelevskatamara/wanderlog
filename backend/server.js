@@ -37,6 +37,10 @@ app.use('/api/images', require('./routes/images'));
 // DB tools (dev only)
 app.use('/db', require('./routes/db'));
 
+app.use('/api/uploads', require('./routes/uploads'));
+// Serve uploaded files as static
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 //Serve React app in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
@@ -58,3 +62,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🌍 WanderLog server running on port ${PORT}`));
 
 module.exports = app;
+

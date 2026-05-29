@@ -9,6 +9,7 @@ import TripDetailPage from './pages/TripDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import HomePage from './pages/HomePage';
 
 // Route guards
 const PrivateRoute = ({ children }) => {
@@ -34,7 +35,7 @@ const PublicRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
       <Route path="/explore" element={<PrivateRoute><ExploreCountriesPage /></PrivateRoute>} />

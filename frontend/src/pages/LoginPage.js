@@ -60,9 +60,11 @@ export default function LoginPage() {
 
       {/* Left panel - hidden on mobile */}
       <div className="hidden lg:flex flex-1 flex-col items-center justify-center p-12 gap-8">
-        <div className="text-8xl">🌍</div>
+        <div className="block">
+          <img src="images/logo.svg" alt="WanderLog" className="w-auto h-[45px] min-[480px]:h-[85px]" />
+        </div>
         <h2 className="text-4xl font-black text-slate-800 text-center leading-tight">
-          Log your journeys,<br />explore the world
+          Log your journeys,<span className="block text-primary">explore the world</span>
         </h2>
         <p className="text-slate-500 text-center max-w-sm leading-relaxed">
           Plan trips, discover 195 countries with live weather, and build your personal travel journal.
@@ -83,8 +85,11 @@ export default function LoginPage() {
         <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-10 w-full max-w-md">
 
           {/* Logo */}
-          <div className="text-center mb-8">
-            <span className="text-2xl font-black text-primary">🌍 WanderLog</span>
+          <div className="flex flex-row items-center justify-center -mx-1 mb-5">
+            <div className="px-1">
+              <img src="images/logo.svg" alt="WanderLog" className="w-auto h-[45px] min-[480px]:h-[45px]" />
+            </div>
+            <div className="px-1 text-2xl font-black text-primary">WanderLog</div>
           </div>
 
           {/* Tab switcher */}

@@ -58,7 +58,7 @@ router.post('/register', async (req, res, next) => {
     res.status(201).json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
     });
   } catch (err) { next(err); }
 });
@@ -96,10 +96,18 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
 
     const token = signToken(user._id);
+    // Login
     res.json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
+    });
+
+    // Register
+    res.status(201).json({
+      success: true,
+      token,
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
     });
   } catch (err) { next(err); }
 });

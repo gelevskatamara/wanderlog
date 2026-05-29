@@ -14,6 +14,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { TripsIcon, EditIcon, DeleteIcon, StarIcon, SuccessIcon, WarningIcon } from '../components/common/Icons';
 import { getTrip, deleteTrip, updateTrip, getTripReviews, createReview, deleteReview } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import TripGallery from '../components/common/TripGallery';
 
 const StarRating = ({ value, onChange }) => (
   <div className="flex gap-1 mb-4">
@@ -156,6 +157,8 @@ export default function TripDetailPage() {
                 <p className="text-sm text-slate-500 leading-relaxed">{trip.description}</p>
               </div>
             )}
+
+            <TripGallery trip={trip} />
 
             {/* Reviews */}
             <div className="card p-4 sm:p-6">

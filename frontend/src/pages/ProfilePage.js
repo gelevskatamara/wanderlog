@@ -9,6 +9,7 @@ import Alert from '../components/common/Alert';
 import StatusBadge from '../components/common/StatusBadge';
 import { useAuth } from '../context/AuthContext';
 import { updateMe, changePassword } from '../services/api';
+import AvatarUpload from '../components/common/AvatarUpload';
 
 export default function ProfilePage() {
   const { user, setUser } = useAuth();
@@ -56,9 +57,7 @@ export default function ProfilePage() {
 
         {/* Hero */}
         <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-soft-pink via-soft-purple to-primary-light p-6 sm:p-8 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/40 flex items-center justify-center text-2xl sm:text-3xl font-black text-white shadow-md flex-shrink-0">
-            {user?.name?.[0]?.toUpperCase()}
-          </div>
+          <AvatarUpload />
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-800">{user?.name}</h2>
             <p className="text-sm text-slate-500 mt-0.5">{user?.email}</p>
