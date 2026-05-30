@@ -24,9 +24,12 @@ export default function Sidebar() {
 
   const NavContent = () => (
     <>
-      <div className="px-5 py-5 border-b border-slate-100">
+      <div className="px-5 py-6 border-b border-slate-100">
         <a href="/" className="flex items-center gap-2 no-underline">
-          <span className="text-xl font-black text-primary tracking-tight">🌍 WanderLog</span>
+          <span className="mr-2">
+            <img src="/images/logo.svg" alt="WanderLog" className="w-auto h-[9vw] min-[480px]:h-[35px]" />
+          </span>
+          <span className="text-[3.5vw] min-[480px]:text-base lg:text-[20px] leading-none font-bold text-[#636bab]">Wanderlog</span>
         </a>
       </div>
 
@@ -95,17 +98,28 @@ export default function Sidebar() {
       </aside>
 
       {/* Mobile top bar — z-[60] so it sits above everything except the drawer */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 h-14 flex items-center justify-between px-4 shadow-sm">
-        <a href="/" className="text-lg font-black text-primary">🌍 WanderLog</a>
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-slate-50 transition-colors"
-          aria-label="Toggle menu"
-        >
-          <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
-          <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-        </button>
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 h-14 flex flex-col justify-center shadow-sm px-4">
+        <div className="flex items-center -mx-1">
+          <div className="px-1">
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-slate-50 transition-colors"
+              aria-label="Toggle menu"
+            >
+              <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            </button>
+          </div>
+          <div className="px-1">
+            <a href="/" className="text-lg font-black text-primary flex">
+              <span className="mr-2">
+                <img src="/images/logo.svg" alt="WanderLog" className="w-auto h-[9vw] min-[480px]:h-[25px]" />
+              </span>
+              <span className="text-sm min-[480px]:text-base lg:text-[20px] leading-9 lg:leading-none font-bold text-[#636bab]">Wanderlog</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Backdrop — z-[70] covers everything including the top bar */}
@@ -118,7 +132,12 @@ export default function Sidebar() {
       <aside className={`lg:hidden fixed top-0 left-0 z-[80] h-full w-64 bg-white flex flex-col shadow-2xl transform transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Drawer header with close button on the RIGHT edge of the drawer (left side of screen) */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
-          <a href="/" className="text-lg font-black text-primary">🌍 WanderLog</a>
+          <a href="/" className="text-lg font-black text-primary flex items-center">
+            <span className="mr-2">
+              <img src="/images/logo.svg" alt="WanderLog" className="w-auto h-[9vw] min-[480px]:h-[35px]" />
+            </span>
+            <span className="text-[3.5vw] min-[480px]:text-base lg:text-[20px] leading-none font-bold text-[#636bab]">Wanderlog</span>
+          </a>
           <button
             onClick={() => setMobileOpen(false)}
             className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors text-sm font-bold"

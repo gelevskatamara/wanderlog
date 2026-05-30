@@ -102,7 +102,13 @@ export default function TripGallery({ trip }) {
         </div>
       ) : photos.length === 0 ? (
         <div className="text-center py-10 text-slate-400">
-          <div className="text-4xl mb-3">📷</div>
+          <div className="flex flex-col justify-center items-center mb-3">
+            <svg className="size-5 md:size-9" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path opacity="0.4" d="M3.99798 20H15.518C18.278 20 19.378 18.31 19.508 16.25V7.99C19.648 5.83 17.928 4 15.758 4C15.148 4 14.588 3.65 14.308 3.11L13.588 1.66C13.128 0.75 11.928 0 10.908 0H8.61799C7.58799 0 6.38798 0.75 5.92798 1.66L5.20798 3.11C4.92798 3.65 4.36798 4 3.75798 4C1.58798 4 -0.13202 5.83 0.00798004 7.99L0.00798004 16.25C0.12798 18.31 1.23798 20 3.99798 20Z" fill="#636bab"/>
+              <path d="M11.2578 6.75H8.25781C7.84781 6.75 7.50781 6.41 7.50781 6C7.50781 5.59 7.84781 5.25 8.25781 5.25H11.2578C11.6678 5.25 12.0078 5.59 12.0078 6C12.0078 6.41 11.6678 6.75 11.2578 6.75Z" fill="#636bab"/>
+              <path d="M9.75891 16.1311C11.6256 16.1311 13.1389 14.6178 13.1389 12.7511C13.1389 10.8844 11.6256 9.37109 9.75891 9.37109C7.89218 9.37109 6.37891 10.8844 6.37891 12.7511C6.37891 14.6178 7.89218 16.1311 9.75891 16.1311Z" fill="#636bab"/>
+            </svg>
+          </div>
           <p className="text-sm">No photos yet.</p>
           {canUpload && (
             <label className="mt-3 inline-block cursor-pointer text-xs text-primary font-semibold hover:underline">

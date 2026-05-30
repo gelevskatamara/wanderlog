@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login, register } from '../services/api';
 import FormInput from '../components/common/FormInput';
@@ -24,7 +24,8 @@ const validateRegister = (v) => {
 };
 
 export default function LoginPage() {
-  const [mode, setMode] = useState('login');
+  const [searchParams] = useSearchParams();
+  const [mode, setMode] = useState(searchParams.get('tab') === 'register' ? 'register' : 'login');
   const [apiError, setApiError] = useState('');
   const [apiLoading, setApiLoading] = useState(false);
   const { loginUser } = useAuth();

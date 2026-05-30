@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 // Arrow icon SVG used in buttons
-const ArrowIcon = ({ color = 'white' }) => (
+const ArrowIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9.00033 17.3334C13.6027 17.3334 17.3337 13.6025 17.3337 9.00008C17.3337 4.39771 13.6027 0.666748 9.00033 0.666748C4.39795 0.666748 0.666992 4.39771 0.666992 9.00008C0.666992 13.6025 4.39795 17.3334 9.00033 17.3334Z" stroke={color} strokeWidth="1.25" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M7.9502 11.9419L10.8835 9.00026L7.9502 6.05859" stroke={color} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M9.00033 17.3334C13.6027 17.3334 17.3337 13.6025 17.3337 9.00008C17.3337 4.39771 13.6027 0.666748 9.00033 0.666748C4.39795 0.666748 0.666992 4.39771 0.666992 9.00008C0.666992 13.6025 4.39795 17.3334 9.00033 17.3334Z" stroke="currentColor" strokeWidth="1.25" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M7.9502 11.9419L10.8835 9.00026L7.9502 6.05859" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -19,20 +19,29 @@ const DownArrowIcon = ({ color = 'white' }) => (
 export default function HomePage() {
   const { user } = useAuth();
   const loginPath = user ? '/dashboard' : '/login';
+  const registerPath = user ? '/dashboard' : '/login?tab=register';
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
   // Lock body scroll when menu open
   if (typeof document !== 'undefined') {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
   }
+  
 
   return (
     <div className="w-full relative overflow-x-hidden font-urbanist bg-[#eff6ff]">
 
       {/* Header */}
-      <header className="w-screen min-[1420px]:w-[1430px] min-[1420px]:mx-auto min-[1420px]:rounded-[100px] min-[1420px]:px-10 transition-all duration-300 bg-white bg-opacity-90 backdrop-blur-sm fixed top-0 min-[1420px]:top-7 min-[1420px]:left-1/2 min-[1420px]:-translate-x-1/2 h-[70px] sm:h-[80px] lg:h-[90px] z-[5001] shadow-[0px_4px_10px_1px_rgba(0,0,0,0.1)]">
+      <header className={`w-screen min-[1420px]:w-[1430px] min-[1420px]:mx-auto min-[1420px]:rounded-[100px] min-[1420px]:px-10 transition-all duration-500 text-white fixed min-[1420px]:top-7 min-[1420px]:left-1/2 min-[1420px]:-translate-x-1/2 h-[70px] sm:h-[80px] lg:h-[90px] z-[5001] shadow-[0px_4px_10px_1px_rgba(0,0,0,0.1)] bg-white backdrop-blur-sm ${scrolled ? 'bg-opacity-90' : 'bg-opacity-10'}`}>
         <div className="mx-auto w-[1450px] px-5 max-w-full h-full">
-          <div className="flex flex-row items-center justify-between w-full h-full -mx-3">
+          <div className="flex flex-row items-center justify-between h-full -mx-3">
             <div className="px-3">
               <Link to="/" className="flex flex-row items-center no-underline">
                 <span className="mr-2">
@@ -49,9 +58,9 @@ export default function HomePage() {
                 className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-slate-50 transition-colors"
                 aria-label="Toggle menu"
               >
-                <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-                <span className={`block w-5 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                <span className={`block w-9 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`block w-9 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+                <span className={`block w-9 h-0.5 bg-slate-700 rounded-full transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
               </button>
             </div>
 
@@ -66,7 +75,7 @@ export default function HomePage() {
                 <div className="px-5">
                   <div className="flex items-center gap-2">
                     <Link to={loginPath} className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-gray-800 bg-white border border-slate-200 cursor-pointer transition-shadow hover:shadow-md uppercase">Log in</Link>
-                    <Link to={loginPath} className="inline-block min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium uppercase">Get started</Link>
+                    <Link to={registerPath} className="inline-block min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium uppercase">Get started</Link>
                   </div>
                 </div>
               </div>
@@ -83,18 +92,15 @@ export default function HomePage() {
 
       {/* Mobile drawer */}
       <div className={`lg:hidden fixed top-0 right-0 z-[5000] h-full w-72 bg-white flex flex-col shadow-2xl transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        {/* Drawer header */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-slate-100">
-          <Link to="/" className="flex items-center gap-2 no-underline" onClick={() => setMenuOpen(false)}>
-            <img src="/logo.svg" alt="WanderLog" className="h-8 w-auto" />
-            <span className="text-lg font-bold text-[#636bab]">Wanderlog</span>
-          </Link>
-          <button
-            onClick={() => setMenuOpen(false)}
+        {/* Drawer header — just close button, no logo */}
+        <div className="flex items-center justify-end px-4 py-4 border-b border-slate-100">
+            <button
+            onClick={() => setMobileOpen(false)}
             className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors text-sm font-bold"
-          >
+            aria-label="Close menu"
+            >
             ✕
-          </button>
+            </button>
         </div>
 
         {/* Nav links */}
@@ -131,13 +137,13 @@ export default function HomePage() {
       </div>
 
       {/* Hero */}
-      <section className="w-full relative block pb-10 sm:pb-16 md:pb-20 overflow-hidden pt-[150px] sm:pt-[180px] lg:pt-[200px]">
+      <section className="w-full sm:h-dvh relative block pb-10 sm:pb-16 md:pb-20 overflow-hidden pt-[130px] sm:pt-[180px] lg:pt-[200px]">
         <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-200/50 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-72 h-72 bg-pink-200/50 rounded-full blur-3xl" />
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <svg width="2929" height="1565" viewBox="0 0 2929 1565" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <path opacity="0.1" d="M12.5118 336.888C264.057 319.08 765.189 348.573 933.039 91.3485C1096.99 -159.897 69.3965 242.529 373.895 552.073C729.834 913.909 2315.4 134.646 1791.14 137.367C1497.84 138.89 741.3 752.288 1163.65 879.862C1700.94 1042.15 2791.82 439.628 2618.32 329.253C2312.25 134.535 1258.46 983.05 1688.35 1172.21C2200.98 1397.77 3040.25 906.749 2875.42 718.147C2743.55 567.264 2142.62 1207.37 2915.94 1552.5" stroke="#0E7490" strokeWidth="25" strokeLinecap="round"/>
-          </svg>
+          <svg width="2929" height="1565" viewBox="0 0 2929 1565" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full hidden sm:block"> 
+                <path opacity="0.1" d="M12.5118 336.888C264.057 319.08 765.189 348.573 933.039 91.3485C1096.99 -159.897 69.3965 242.529 373.895 552.073C729.834 913.909 2315.4 134.646 1791.14 137.367C1497.84 138.89 741.3 752.288 1163.65 879.862C1700.94 1042.15 2791.82 439.628 2618.32 329.253C2312.25 134.535 1258.46 983.05 1688.35 1172.21C2200.98 1397.77 3040.25 906.749 2875.42 718.147C2743.55 567.264 2142.62 1207.37 2915.94 1552.5" stroke="#0E7490" stroke-width="25" stroke-linecap="round"/>
+            </svg>
         </div>
 
         <div className="max-w-[1420px] h-full mx-auto px-5 relative z-20">
@@ -154,13 +160,13 @@ export default function HomePage() {
               </p>
               <div className="flex flex-row flex-wrap items-center justify-center gap-3 -mx-2">
                 <div className="px-2">
-                  <Link to={loginPath} className="inline-flex items-center gap-2 min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium">
-                    Start for free <ArrowIcon />
+                  <Link to={registerPath} className="inline-flex items-center gap-2 min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium">
+                    Start now <ArrowIcon />
                   </Link>
                 </div>
                 <div className="px-2">
                   <a href="#how-it-works" className="inline-flex items-center gap-2 min-h-[38px] bg-transparent border border-[#636BAB] text-[#636BAB] rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB] hover:text-white text-base font-medium">
-                    See how it works <ArrowIcon color="#636BAB" />
+                    See how it works <ArrowIcon />
                   </a>
                 </div>
               </div>
@@ -169,7 +175,7 @@ export default function HomePage() {
               <div className="flex flex-row flex-wrap items-center justify-center pt-14 -mx-4">
                 {[
                   ['1,200+', 'Travellers'],
-                  ['195', 'Countries'],
+                  ['250', 'Countries'],
                   ['4,800+', 'Trips Logged'],
                   ['9,300+', 'Reviews Written'],
                 ].map(([val, label], i) => (
@@ -198,7 +204,7 @@ export default function HomePage() {
 
           <div className="flex flex-row flex-wrap justify-center -mx-4">
             {[
-                { img: '/images/screenshots/explore-countries.png', title: 'Explore Countries', desc: 'Browse 195 countries with real-time weather, local info, currency, timezone, and more. Powered by REST Countries and OpenWeatherMap APIs.', overlay: '#636BAB' },
+                { img: '/images/screenshots/explore-countries.png', title: 'Explore Countries', desc: 'Browse 250 countries with real-time weather, local info, currency, timezone, and more. Powered by REST Countries and OpenWeatherMap APIs.', overlay: '#636BAB' },
                 { img: '/images/screenshots/trip-details.png', title: 'Log Your Trips', desc: 'Log every trip — add dates, destinations, a description, and your personal status. Keep your travel history in one place and easily switch between planned, ongoing, and completed trips.', overlay: '#E4C2C6' },
                 { img: '/images/screenshots/trips.png', title: 'Review & Remember', desc: 'Rate and review every trip. Share your highlights, tips, and memories. Look back on every adventure with the detail it deserves.', overlay: '#CBC0D3' },
                 ].map(({ img, title, desc, overlay }) => (
@@ -419,7 +425,7 @@ export default function HomePage() {
           </div>
           <div className="text-center mt-10">
             <Link to={loginPath} className="inline-flex items-center gap-2 min-h-[38px] bg-transparent border border-[#636BAB] text-[#636BAB] rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB] hover:text-white text-base font-medium">
-              Explore all countries <ArrowIcon color="#636BAB" />
+              Explore all countries <ArrowIcon />
             </Link>
           </div>
         </div>
@@ -435,10 +441,10 @@ export default function HomePage() {
             <div className="bg-white mx-auto rounded-xl w-[520px] max-w-full text-center relative z-30 px-6 py-10 sm:py-12">
               <div className="max-w-full w-[470px] mx-auto">
                 <h3 className="font-urbanist font-extrabold text-3xl sm:text-[38px] leading-tight -tracking-tight mb-4 text-slate-800">Start your travel journal today</h3>
-                <p className="text-slate-500 mb-8 text-base">Join over 1,200 travellers already logging their adventures on WanderLog.</p>
-                <Link to={loginPath} className="inline-flex items-center gap-2 min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium">
-                  Get started for free <ArrowIcon />
-                </Link>
+                <p className="text-slate-500 mb-8 text-base">Still have doubts? Don't hesitate to contact us — we'll walk you through everything WanderLog has to offer.</p>
+                <a href="mailto:info.wanderlog@gmail.com" className="inline-flex items-center gap-2 min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium">
+                  Get in touch <ArrowIcon />
+                </a>
               </div>
             </div>
           </div>

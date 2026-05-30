@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import HomePage from './pages/HomePage';
+import CookieBanner from './components/common/CookieBanner';
 
 // Route guards
 const PrivateRoute = ({ children }) => {
@@ -34,18 +35,21 @@ const PublicRoute = ({ children }) => {
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-      <Route path="/explore" element={<PrivateRoute><ExploreCountriesPage /></PrivateRoute>} />
-      <Route path="/explore/:name" element={<PrivateRoute><CountryDetailPage /></PrivateRoute>} />
-      <Route path="/trips" element={<PrivateRoute><MyTripsPage /></PrivateRoute>} />
-      <Route path="/trips/:id" element={<PrivateRoute><TripDetailPage /></PrivateRoute>} />
-      <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-      <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-      <Route path="*" element={<Navigate to="/dashboard" />} />
-    </Routes>
+    <>
+      <CookieBanner />
+      <Routes>
+        <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/explore" element={<PrivateRoute><ExploreCountriesPage /></PrivateRoute>} />
+        <Route path="/explore/:name" element={<PrivateRoute><CountryDetailPage /></PrivateRoute>} />
+        <Route path="/trips" element={<PrivateRoute><MyTripsPage /></PrivateRoute>} />
+        <Route path="/trips/:id" element={<PrivateRoute><TripDetailPage /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </>
   );
 }
 

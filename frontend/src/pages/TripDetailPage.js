@@ -13,7 +13,7 @@ import StatusBadge from '../components/common/StatusBadge';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ConfirmModal from '../components/common/ConfirmModal';
 import TripGallery from '../components/common/TripGallery';
-import { TripsIcon, EditIcon, DeleteIcon, StarIcon, SuccessIcon, WarningIcon } from '../components/common/Icons';
+import { TripsIcon, EditIcon, InviteIcon, DeleteIcon, StarIcon, SuccessIcon, WarningIcon } from '../components/common/Icons';
 import { getTrip, deleteTrip, updateTrip, getTripReviews, createReview, deleteReview } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import InviteGuestModal from '../components/common/InviteGuestModal';
@@ -130,8 +130,8 @@ export default function TripDetailPage() {
         action={canEdit && (
           <div className="flex gap-2">
             {isOwner && (
-              <Button variant="secondary" onClick={() => setInviteModal(true)} className="text-sm px-3 py-2">
-                👥 Invite
+              <Button variant="secondary" onClick={() => setInviteModal(true)} className="text-sm px-3 py-2 flex items-center gap-1.5">
+                <InviteIcon className="w-4 h-4" /> Invite
               </Button>
             )}
             <Button variant="secondary" onClick={() => setEditModal(true)} className="text-sm px-3 py-2 flex items-center gap-1.5"><EditIcon className="w-4 h-4" /> Edit</Button>
@@ -140,6 +140,15 @@ export default function TripDetailPage() {
         )}
       />
       <PageWrapper>
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-medium mb-4"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back to Trips
+        </button>
 
         {/* Hero */}
         <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-light via-soft-purple to-soft-pink p-6 sm:p-8 mb-6 relative overflow-hidden">
