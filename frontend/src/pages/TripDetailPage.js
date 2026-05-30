@@ -194,8 +194,11 @@ export default function TripDetailPage() {
                   {reviews.map(r => (
                     <div key={r._id} className="bg-soft-blue rounded-xl p-3 sm:p-4">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-soft-pink to-soft-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                          {r.userId?.name?.[0]?.toUpperCase()}
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-soft-pink to-soft-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+                          {r.userId?.avatar
+                            ? <img src={`${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000'}${r.userId.avatar}`} alt="" className="w-full h-full object-cover" />
+                            : r.userId?.name?.[0]?.toUpperCase()
+                          }
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-slate-800 truncate">{r.userId?.name}</p>

@@ -13,10 +13,10 @@ API.interceptors.response.use(
   (err) => {
     const is401 = err.response?.status === 401;
     const token = localStorage.getItem('wl_token');
-    const isLoginEndpoint = err.config?.url?.includes('/auth/login') || 
-                            err.config?.url?.includes('/auth/register');
-    
-    // Only log out if user has a token and it's not a login/register attempt
+    const isLoginEndpoint = err.config?.url?.includes('/auth/login') ||
+                            err.config?.url?.includes('/auth/register') ||
+                            err.config?.url?.includes('/auth/change-password');
+
     if (is401 && token && !isLoginEndpoint) {
       localStorage.removeItem('wl_token');
       localStorage.removeItem('wl_user');

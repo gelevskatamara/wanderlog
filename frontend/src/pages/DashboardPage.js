@@ -43,11 +43,11 @@ export default function DashboardPage() {
       <PageHeader
         title="Dashboard"
         subtitle={`Welcome back, ${user?.name} 👋`}
-        action={
+        action={user?.role !== 'guest' && (
           <Link to="/trips">
             <Button className="text-sm px-4 py-2">+ New Trip</Button>
           </Link>
-        }
+        )}
       />
       <PageWrapper>
         {loading ? <LoadingSpinner /> : (

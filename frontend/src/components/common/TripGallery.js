@@ -33,6 +33,16 @@ export default function TripGallery({ trip }) {
 
   useEffect(() => { load(); }, [trip._id]);
 
+  // Add this useEffect after the existing ones
+  useEffect(() => {
+    if (lightbox) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [lightbox]);
+
   const handleUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;

@@ -30,7 +30,7 @@ const { protect, authorize } = require('../middleware/auth');
 router.get('/trip/:tripId', async (req, res, next) => {
   try {
     const reviews = await Review.find({ tripId: req.params.tripId })
-      .populate('userId', 'name')
+      .populate('userId', 'name avatar')
       .sort({ createdAt: -1 });
     res.json({ success: true, count: reviews.length, reviews });
   } catch (err) { next(err); }
