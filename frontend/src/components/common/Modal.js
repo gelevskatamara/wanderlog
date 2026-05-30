@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Button from './Button';
 
 export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) {
   useEffect(() => {
@@ -17,19 +16,26 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-backdrop" onClick={onClose} />
-      <div className={`modal-box w-full ${maxWidth}`}>
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-black text-slate-800">{title}</h3>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors duration-200"
-          >
-            ✕
-          </button>
+    <div
+      className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm overflow-y-auto"
+      onClick={onClose}
+    >
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div
+          className={`bg-white rounded-3xl shadow-2xl w-full ${maxWidth} relative p-6 my-8`}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-black text-slate-800">{title}</h3>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors duration-200"
+            >
+              ✕
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
       </div>
     </div>
   );

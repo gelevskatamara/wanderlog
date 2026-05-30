@@ -11,10 +11,12 @@ import FormTextarea from '../components/common/FormTextarea';
 import Alert from '../components/common/Alert';
 import StatusBadge from '../components/common/StatusBadge';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import ConfirmModal from '../components/common/ConfirmModal';
+import TripGallery from '../components/common/TripGallery';
 import { TripsIcon, EditIcon, DeleteIcon, StarIcon, SuccessIcon, WarningIcon } from '../components/common/Icons';
 import { getTrip, deleteTrip, updateTrip, getTripReviews, createReview, deleteReview } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import TripGallery from '../components/common/TripGallery';
+import InviteGuestModal from '../components/common/InviteGuestModal';
 
 const StarRating = ({ value, onChange }) => (
   <div className="flex gap-1 mb-4">
@@ -46,6 +48,10 @@ export default function TripDetailPage() {
   const [reviewError, setReviewError] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [savingReview, setSavingReview] = useState(false);
+  const [confirmDeleteReview, setConfirmDeleteReview] = useState(null);
+  const [confirmDeleteTrip, setConfirmDeleteTrip] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  const [inviteModal, setInviteModal] = useState(false);
 
   const load = () => {
     Promise.all([getTrip(id), getTripReviews(id)])
@@ -70,14 +76,14 @@ export default function TripDetailPage() {
 
   const handleDelete = async () => {
     try { await deleteTrip(id); navigate('/trips'); }
-    catch (err) { alert(err.response?.data?.message || 'Delete failed'); }
+    catch (err) { setDeleteError(err.response?.data?.message || 'Delete failed'); setConfirmDeleteTrip(false); }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setSavingEdit(true);
     try { await updateTrip(id, editForm); setEditModal(false); load(); }
-    catch (err) { alert(err.response?.data?.message || 'Update failed'); }
+    catch (err) { setDeleteError(err.response?.data?.message || 'Update failed'); }
     finally { setSavingEdit(false); }
   };
 
@@ -95,9 +101,11 @@ export default function TripDetailPage() {
     finally { setSavingReview(false); }
   };
 
-  const handleDeleteReview = async (rid) => {
-    if (!window.confirm('Delete this review?')) return;
-    try { await deleteReview(rid); load(); } catch { alert('Delete failed'); }
+  const handleDeleteReview = (rid) => setConfirmDeleteReview(rid);
+
+  const handleConfirmDeleteReview = async () => {
+    try { await deleteReview(confirmDeleteReview); setConfirmDeleteReview(null); load(); }
+    catch { setConfirmDeleteReview(null); }
   };
 
   if (loading) return <AppLayout><LoadingSpinner /></AppLayout>;
@@ -110,6 +118,7 @@ export default function TripDetailPage() {
   );
 
   const ownerId = trip.userId?._id || trip.userId;
+  const isOwner = ownerId === user?._id || user?.role === 'admin';
   const canEdit = ownerId === user?._id || user?.role === 'admin';
   const days = Math.ceil((new Date(trip.endDate) - new Date(trip.startDate)) / (1000 * 60 * 60 * 24));
 
@@ -120,8 +129,13 @@ export default function TripDetailPage() {
         subtitle={`${trip.destination} · ${days} days`}
         action={canEdit && (
           <div className="flex gap-2">
+            {isOwner && (
+              <Button variant="secondary" onClick={() => setInviteModal(true)} className="text-sm px-3 py-2">
+                👥 Invite
+              </Button>
+            )}
             <Button variant="secondary" onClick={() => setEditModal(true)} className="text-sm px-3 py-2 flex items-center gap-1.5"><EditIcon className="w-4 h-4" /> Edit</Button>
-            <Button variant="danger" onClick={() => setDeleteModal(true)} className="text-sm px-3 py-2 flex items-center gap-1.5"><DeleteIcon className="w-4 h-4" /> Delete</Button>
+            <Button variant="danger" onClick={() => setConfirmDeleteTrip(true)} className="text-sm px-3 py-2 flex items-center gap-1.5"><DeleteIcon className="w-4 h-4" /> Delete</Button>
           </div>
         )}
       />
@@ -157,7 +171,6 @@ export default function TripDetailPage() {
                 <p className="text-sm text-slate-500 leading-relaxed">{trip.description}</p>
               </div>
             )}
-
             <TripGallery trip={trip} />
 
             {/* Reviews */}
@@ -190,7 +203,7 @@ export default function TripDetailPage() {
                         </div>
                         <span className="text-xs text-slate-400 flex-shrink-0">{new Date(r.createdAt).toLocaleDateString()}</span>
                         {(r.userId?._id === user?._id || user?.role === 'admin') && (
-                          <button onClick={() => handleDeleteReview(r._id)} className="text-slate-300 hover:text-red-400 transition-colors"><DeleteIcon className="w-4 h-4" /></button>
+                          <button onClick={() => setConfirmDeleteReview(r._id)} className="text-slate-300 hover:text-red-400 transition-colors"><DeleteIcon className="w-4 h-4" /></button>
                         )}
                       </div>
                       <p className="text-sm text-slate-500 leading-relaxed">{r.comment}</p>
@@ -222,17 +235,22 @@ export default function TripDetailPage() {
         </div>
       </PageWrapper>
 
-      {/* Delete Modal */}
-      <Modal isOpen={deleteModal} onClose={() => setDeleteModal(false)} title="Delete Trip?" maxWidth="max-w-sm">
-        <div className="text-center">
-          <div className="flex justify-center mb-3 text-red-400"><DeleteIcon className="w-12 h-12" /></div>
-          <p className="text-sm text-slate-500 mb-6">This will permanently delete <strong>"{trip.title}"</strong>. This cannot be undone.</p>
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={() => setDeleteModal(false)} className="flex-1">Cancel</Button>
-            <Button variant="danger" onClick={handleDelete} className="flex-1">Delete</Button>
-          </div>
-        </div>
-      </Modal>
+      <ConfirmModal
+        isOpen={confirmDeleteTrip}
+        onClose={() => setConfirmDeleteTrip(false)}
+        onConfirm={handleDelete}
+        title="Delete Trip?"
+        message={`This will permanently delete "${trip.title}". This cannot be undone.`}
+        confirmText="Delete"
+      />
+      <ConfirmModal
+        isOpen={!!confirmDeleteReview}
+        onClose={() => setConfirmDeleteReview(null)}
+        onConfirm={handleConfirmDeleteReview}
+        title="Delete Review?"
+        message="This will permanently delete your review. This cannot be undone."
+        confirmText="Delete"
+      />
 
       {/* Edit Modal */}
       <Modal isOpen={editModal} onClose={() => setEditModal(false)} title="Edit Trip ✏️">
@@ -280,6 +298,11 @@ export default function TripDetailPage() {
           </div>
         </form>
       </Modal>
+      <InviteGuestModal
+        isOpen={inviteModal}
+        onClose={() => setInviteModal(false)}
+        trip={trip}
+      />
     </AppLayout>
   );
 }

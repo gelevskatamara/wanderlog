@@ -11,11 +11,13 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (res) => res,
   (err) => {
-    const url = err.config?.url || '';
     const is401 = err.response?.status === 401;
-    const isAuthRoute = url.includes('/auth/');
-    // Only log out if it's an auth endpoint failing, not weather/countries/etc
-    if (is401 && isAuthRoute) {
+    const token = localStorage.getItem('wl_token');
+    const isLoginEndpoint = err.config?.url?.includes('/auth/login') || 
+                            err.config?.url?.includes('/auth/register');
+    
+    // Only log out if user has a token and it's not a login/register attempt
+    if (is401 && token && !isLoginEndpoint) {
       localStorage.removeItem('wl_token');
       localStorage.removeItem('wl_user');
       window.location.href = '/login';
@@ -74,3 +76,7 @@ export const uploadAvatar = (formData) => API.post('/uploads/avatar', formData, 
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 export const removeAvatar = () => API.delete('/uploads/avatar');
+
+export const inviteGuest = (tripId, data) => API.post(`/trips/${tripId}/invite`, data);
+export const getTripGuests = (tripId) => API.get(`/trips/${tripId}/guests`);
+export const removeGuest = (tripId, guestId) => API.delete(`/trips/${tripId}/guests/${guestId}`);

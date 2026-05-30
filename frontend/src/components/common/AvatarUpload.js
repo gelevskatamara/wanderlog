@@ -1,12 +1,15 @@
 import { useRef, useState } from "react";
 import { uploadAvatar, removeAvatar } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import ConfirmModal from "./ConfirmModal";
 
 const API_BASE = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
 
 export default function AvatarUpload() {
   const { user, setUser } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const fileRef = useRef();
 
   const handleUpload = async (e) => {
@@ -20,22 +23,24 @@ export default function AvatarUpload() {
       setUser(res.data.user);
       localStorage.setItem("wl_user", JSON.stringify(res.data.user));
     } catch (err) {
-      alert(err.response?.data?.message || "Upload failed");
+      setUploadError(err.response?.data?.message || "Upload failed");
     } finally {
       setUploading(false);
       fileRef.current.value = "";
     }
   };
 
-  const handleRemove = async () => {
-    if (!window.confirm("Remove your avatar?")) return;
+  const handleRemove = () => setConfirmRemove(true);
+
+  const handleConfirmRemove = async () => {
     try {
       await removeAvatar();
       const updated = { ...user, avatar: "" };
       setUser(updated);
       localStorage.setItem("wl_user", JSON.stringify(updated));
+      setConfirmRemove(false);
     } catch {
-      alert("Failed to remove avatar");
+      setConfirmRemove(false);
     }
   };
 
@@ -93,6 +98,15 @@ export default function AvatarUpload() {
         )}
       </div>
       <p className="text-xs text-slate-400">JPG, PNG or WebP · Max 5MB</p>
+    <ConfirmModal
+      isOpen={confirmRemove}
+      onClose={() => setConfirmRemove(false)}
+      onConfirm={handleConfirmRemove}
+      title="Remove Avatar?"
+      message="This will remove your profile photo. You can upload a new one at any time."
+      confirmText="Remove"
+      confirmVariant="danger"
+    />
     </div>
   );
 }

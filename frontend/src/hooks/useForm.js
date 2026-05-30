@@ -24,14 +24,20 @@ const useForm = (initialValues, validate) => {
   };
 
   const handleSubmit = (onSubmit) => (e) => {
-    e.preventDefault();
-    if (validate) {
-      const errs = validate(values);
-      setErrors(errs);
-      if (Object.keys(errs).length > 0) return;
-    }
-    onSubmit(values);
-  };
+  e.preventDefault();
+  if (validate) {
+    const errs = validate(values);
+    setErrors(errs);
+    // Mark ALL fields as touched so errors show immediately
+    const allTouched = Object.keys(values).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {});
+    setTouched(allTouched);
+    if (Object.keys(errs).length > 0) return;
+  }
+  onSubmit(values);
+};
 
   const reset = () => { setValues(initialValues); setErrors({}); setTouched({}); };
 

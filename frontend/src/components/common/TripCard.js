@@ -25,8 +25,11 @@ export default function TripCard({ trip, onDelete }) {
       {/* Image area */}
       <div className={`h-36 bg-gradient-to-br ${grad} flex items-center justify-center text-6xl relative`}>
         {emoji || <span className="text-primary"><TripsIcon className="w-14 h-14" /></span>}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
           <StatusBadge status={trip.status} />
+          {trip.isGuestTrip && (
+            <span className="badge badge-guest">Guest</span>
+          )}
         </div>
       </div>
 

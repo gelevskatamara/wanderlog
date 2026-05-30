@@ -70,7 +70,7 @@ router.get('/', async (req, res, next) => {
  */
 router.post('/sync', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const response = await fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,population,area,flags,currencies,languages,cca2,flag');
+    const response = await fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,population,flags,currencies,languages,cca2,car,idd');
     const data = await response.json();
 
     let synced = 0;
@@ -80,29 +80,27 @@ router.post('/sync', protect, authorize('admin'), async (req, res, next) => {
         : [];
       const languages = c.languages ? Object.values(c.languages) : [];
 
-      await Country.findOneAndUpdate(
-        { cca2: c.cca2 },
-        {
+     await Country.findOneAndUpdate(
+      { cca2: c.cca2 },
+      {
+        $set: {
           name: c.name?.common || '',
           officialName: c.name?.official || '',
           capital: c.capital?.[0] || '',
           region: c.region || '',
-          subregion: c.subregion || '',
           population: c.population || 0,
-          area: c.area || 0,
           flag: c.flag || '',
           flagUrl: c.flags?.svg || c.flags?.png || '',
           currencies,
           languages,
-          borders: c.borders || [],
-          timezone: c.timezones?.[0] || '',
           drivingSide: c.car?.side || '',
+          callingCodes: c.idd?.root ? [`${c.idd.root}${(c.idd.suffixes || [''])[0]}`] : [],
           cca2: c.cca2 || '',
-          cca3: c.cca3 || '',
           updatedAt: new Date(),
-        },
-        { upsert: true, new: true }
-      );
+        }
+      },
+      { upsert: true, new: true }
+    );
       synced++;
     }
 

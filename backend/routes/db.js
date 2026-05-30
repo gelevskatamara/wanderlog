@@ -97,4 +97,32 @@ router.get('/seed', async (req, res) => {
   }
 });
 
+router.get('/fix-trips', async (req, res) => {
+  try {
+    const Trip = require('../models/Trip');
+    const result = await Trip.updateMany(
+      { guests: { $exists: false } },
+      { $set: { guests: [] } }
+    );
+    res.json({ success: true, message: `Fixed ${result.modifiedCount} trips` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+
+router.get('/make-admin', async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const user = await User.findOneAndUpdate(
+      { email: 'admin@wanderlog.com' },
+      { role: 'admin' },
+      { new: true }
+    );
+    res.json({ success: true, message: `${user.name} is now admin` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

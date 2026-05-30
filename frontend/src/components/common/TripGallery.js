@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { getTripPhotos, uploadTripPhoto, deleteTripPhoto } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import ConfirmModal from "./ConfirmModal";
 import { DeleteIcon } from "./Icons";
 
 const API_BASE = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
@@ -11,6 +12,8 @@ export default function TripGallery({ trip }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [lightbox, setLightbox] = useState(null);
+  const [confirmPhoto, setConfirmPhoto] = useState(null);
+  const [uploadError, setUploadError] = useState("");
   const [caption, setCaption] = useState("");
   const fileRef = useRef();
 
@@ -42,21 +45,18 @@ export default function TripGallery({ trip }) {
       setCaption("");
       load();
     } catch (err) {
-      alert(err.response?.data?.message || "Upload failed");
+      setUploadError(err.response?.data?.message || "Upload failed");
     } finally {
       setUploading(false);
       fileRef.current.value = "";
     }
   };
 
-  const handleDelete = async (photoId) => {
-    if (!window.confirm("Delete this photo?")) return;
-    try {
-      await deleteTripPhoto(photoId);
-      load();
-    } catch {
-      alert("Delete failed");
-    }
+  const handleDelete = (photoId) => setConfirmPhoto(photoId);
+
+  const handleConfirmDelete = async () => {
+    try { await deleteTripPhoto(confirmPhoto); setConfirmPhoto(null); load(); }
+    catch { setConfirmPhoto(null); }
   };
 
   return (
@@ -124,7 +124,7 @@ export default function TripGallery({ trip }) {
               {/* Delete button */}
               {canUpload && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(p._id); }}
+                  onClick={(e) => { e.stopPropagation(); setConfirmPhoto(p._id); }}
                   className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/50 hover:bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
                 >
                   <DeleteIcon className="w-3 h-3" />
@@ -141,6 +141,19 @@ export default function TripGallery({ trip }) {
         </div>
       )}
 
+      {uploadError && (
+        <div className="mt-2">
+          <Alert type="error" message={uploadError} />
+        </div>
+      )}
+      <ConfirmModal
+        isOpen={!!confirmPhoto}
+        onClose={() => setConfirmPhoto(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Photo?"
+        message="This will permanently delete this photo. This cannot be undone."
+        confirmText="Delete"
+      />
       {/* Lightbox */}
       {lightbox && (
         <div

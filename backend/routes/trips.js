@@ -36,11 +36,24 @@ const { sendTripNotification } = require('../config/email');
  */
 router.get('/', protect, async (req, res, next) => {
   try {
-    const filter = { userId: req.user._id };
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.search) filter.title = { $regex: req.query.search, $options: 'i' };
+    const ownFilter = { userId: req.user._id };
+    if (req.query.status) ownFilter.status = req.query.status;
+    if (req.query.search) ownFilter.title = { $regex: req.query.search, $options: 'i' };
 
-    const trips = await Trip.find(filter).sort({ createdAt: -1 });
+    const guestFilter = { guests: { $in: [req.user._id] } };
+    if (req.query.status) guestFilter.status = req.query.status;
+    if (req.query.search) guestFilter.title = { $regex: req.query.search, $options: 'i' };
+
+    const [ownTrips, guestTrips] = await Promise.all([
+      Trip.find(ownFilter).sort({ createdAt: -1 }),
+      Trip.find(guestFilter).populate('userId', 'name').sort({ createdAt: -1 }),
+    ]);
+
+    const markedGuestTrips = guestTrips.map(t => ({ ...t.toObject(), isGuestTrip: true }));
+    const trips = [...ownTrips, ...markedGuestTrips].sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
     res.json({ success: true, count: trips.length, trips });
   } catch (err) { next(err); }
 });
@@ -124,7 +137,11 @@ router.get('/:id', protect, async (req, res, next) => {
     if (!trip) return res.status(404).json({ success: false, message: 'Trip not found' });
 
     // Only owner or admin can view
-    if (trip.userId._id.toString() !== req.user._id.toString() && req.user.role !== 'admin')
+    const ownerId = trip.userId._id ? trip.userId._id.toString() : trip.userId.toString();
+    const isOwner = ownerId === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    const isGuest = trip.guests && trip.guests.map(g => g.toString()).includes(req.user._id.toString());
+    if (!isOwner && !isAdmin && !isGuest)
       return res.status(403).json({ success: false, message: 'Not authorised' });
 
     res.json({ success: true, trip });
@@ -244,5 +261,94 @@ router.delete('/:id', protect, async (req, res, next) => {
     res.json({ success: true, message: 'Trip deleted' });
   } catch (err) { next(err); }
 });
+
+/**
+ * @swagger
+ * /trips/{id}/invite:
+ *   post:
+ *     summary: Invite a user as guest to view a trip
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email: { type: string }
+ *     responses:
+ *       200:
+ *         description: Guest invited successfully
+ */
+router.post("/:id/invite", protect, authorize("user", "admin"), async (req, res, next) => {
+  try {
+    const trip = await Trip.findById(req.params.id);
+    if (!trip) return res.status(404).json({ success: false, message: "Trip not found" });
+
+    if (trip.userId.toString() !== req.user._id.toString() && req.user.role !== "admin")
+      return res.status(403).json({ success: false, message: "Not authorised" });
+
+    const User = require("../models/User");
+    const invitee = await User.findOne({ email: req.body.email });
+    if (!invitee) return res.status(404).json({ success: false, message: "No user found with that email" });
+
+    if (invitee._id.toString() === req.user._id.toString())
+      return res.status(400).json({ success: false, message: "You cannot invite yourself" });
+
+    if (trip.guests.map(g => g.toString()).includes(invitee._id.toString()))
+      return res.status(400).json({ success: false, message: "This user is already a guest on this trip" });
+
+    trip.guests.push(invitee._id);
+    await trip.save();
+
+    const Notification = require("../models/Notification");
+    await Notification.create({
+      userId: invitee._id,
+      message: `You have been invited to view the trip "${trip.title}" by ${req.user.name}.`,
+      type: "trip_created",
+    });
+
+    res.json({ success: true, message: `${invitee.name} has been invited as a guest` });
+  } catch (err) { next(err); }
+});
+
+router.get("/:id/guests", protect, async (req, res, next) => {
+  try {
+    const trip = await Trip.findById(req.params.id).populate("guests", "name email avatar");
+    if (!trip) return res.status(404).json({ success: false, message: "Trip not found" });
+
+    const ownerId = trip.userId.toString();
+    const isOwner = ownerId === req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
+    if (!isOwner && !isAdmin)
+      return res.status(403).json({ success: false, message: "Not authorised" });
+
+    res.json({ success: true, guests: trip.guests });
+  } catch (err) { next(err); }
+});
+
+router.delete("/:id/guests/:guestId", protect, async (req, res, next) => {
+  try {
+    const trip = await Trip.findById(req.params.id);
+    if (!trip) return res.status(404).json({ success: false, message: "Trip not found" });
+
+    if (trip.userId.toString() !== req.user._id.toString() && req.user.role !== "admin")
+      return res.status(403).json({ success: false, message: "Not authorised" });
+
+    trip.guests = trip.guests.filter(g => g.toString() !== req.params.guestId);
+    await trip.save();
+
+    res.json({ success: true, message: "Guest removed" });
+  } catch (err) { next(err); }
+});
+
 
 module.exports = router;

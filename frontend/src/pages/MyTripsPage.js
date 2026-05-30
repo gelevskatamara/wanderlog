@@ -11,6 +11,7 @@ import FormTextarea from '../components/common/FormTextarea';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import EmptyState from '../components/common/EmptyState';
+import ConfirmModal from '../components/common/ConfirmModal';
 import { SearchIcon, TripsIcon } from '../components/common/Icons';
 import { useAuth } from '../context/AuthContext';
 import { getTrips, createTrip, deleteTrip } from '../services/api';
@@ -40,6 +41,7 @@ export default function MyTripsPage() {
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null); // stores trip id to delete
 
   const fetchTrips = useCallback(() => {
     setLoading(true);
@@ -72,10 +74,11 @@ export default function MyTripsPage() {
     } finally { setSaving(false); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this trip?')) return;
-    try { await deleteTrip(id); fetchTrips(); }
-    catch (err) { alert(err.response?.data?.message || 'Delete failed'); }
+  const handleDelete = (id) => setConfirmDelete(id);
+
+  const handleConfirmDelete = async () => {
+    try { await deleteTrip(confirmDelete); setConfirmDelete(null); fetchTrips(); }
+    catch (err) { setConfirmDelete(null); setApiError(err.response?.data?.message || 'Delete failed'); }
   };
 
   const openModal = () => { setForm(emptyForm); setErrors({}); setApiError(''); setModal(true); };
@@ -119,32 +122,34 @@ export default function MyTripsPage() {
           </div>
         </div>
 
-        {loading ? <LoadingSpinner /> : (
-          <div className="flex flex-wrap gap-4">
-            {trips.map(t => (
-              <div key={t._id} className="w-full min-[480px]:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)]">
-                <TripCard trip={t} onDelete={user?.role !== 'guest' ? handleDelete : null} />
-              </div>
-            ))}
+       {loading ? <LoadingSpinner /> : (
+        <div className="flex flex-wrap gap-4">
+          {trips.length === 0 ? (
+            <div className="w-full">
+              <EmptyState icon={<TripsIcon className="w-12 h-12" />} title="No trips found" message="Start planning your next adventure." action={user?.role !== 'guest' ? 'Plan a Trip' : null} onAction={openModal} />
+            </div>
+          ) : (
+            <>
+              {trips.map(t => (
+                <div key={t._id} className="w-full min-[480px]:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)]">
+                  <TripCard trip={t} onDelete={user?.role !== 'guest' ? handleDelete : null} />
+                </div>
+              ))}
 
-            {trips.length === 0 && (
-              <div className="w-full">
-                <EmptyState icon={<TripsIcon className="w-12 h-12" />} title="No trips found" message="Start planning your next adventure." action={user?.role !== 'guest' ? 'Plan a Trip' : null} onAction={openModal} />
-              </div>
-            )}
-
-            {/* Add card */}
-            {user?.role !== 'guest' && (
-              <div
-                onClick={openModal}
-                className="w-full min-[480px]:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] min-h-[180px] border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer text-slate-300 hover:border-primary hover:text-primary transition-all duration-200"
-              >
-                <span className="text-primary"><TripsIcon className="w-8 h-8" /></span>
-                <span className="text-sm font-semibold">Plan a New Trip</span>
-              </div>
-            )}
-          </div>
-        )}
+              {/* Add card — only when trips exist */}
+              {user?.role !== 'guest' && (
+                <div
+                  onClick={openModal}
+                  className="w-full min-[480px]:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] min-h-[180px] border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer text-slate-300 hover:border-primary hover:text-primary transition-all duration-200"
+                >
+                  <span className="text-primary"><TripsIcon className="w-8 h-8" /></span>
+                  <span className="text-sm font-semibold">Plan a New Trip</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
       </PageWrapper>
 
       {/* New Trip Modal */}
@@ -173,6 +178,14 @@ export default function MyTripsPage() {
           </div>
         </form>
       </Modal>
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Trip?"
+        message="This will permanently delete this trip. This cannot be undone."
+        confirmText="Delete"
+      />
     </AppLayout>
   );
 }

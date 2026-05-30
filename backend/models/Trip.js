@@ -23,7 +23,7 @@ const tripSchema = new mongoose.Schema({
     required: [true, 'End date is required'],
     validate: {
       validator: function (val) {
-        if (!this.startDate) return true; // skip on update
+        if (!this.startDate) return true;
         return new Date(val) >= new Date(this.startDate);
       },
       message: 'End date must be on or after start date',
@@ -44,6 +44,10 @@ const tripSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  guests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
   createdAt: { type: Date, default: Date.now },
 });
 

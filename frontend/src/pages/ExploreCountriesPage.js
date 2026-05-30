@@ -84,40 +84,67 @@ export default function ExploreCountriesPage() {
             )}
 
             {/* Pagination */}
-            {pages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:border-primary hover:text-primary transition-colors text-sm"
-                >
-                  ←
-                </button>
-                {[...Array(Math.min(5, pages))].map((_, i) => {
-                  const p = i + 1;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`w-9 h-9 rounded-xl border text-sm font-semibold transition-all duration-200 ${
-                        page === p
-                          ? 'bg-primary text-white border-primary'
-                          : 'bg-white text-slate-500 border-slate-200 hover:border-primary hover:text-primary'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => setPage(p => Math.min(pages, p + 1))}
-                  disabled={page === pages}
-                  className="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:border-primary hover:text-primary transition-colors text-sm"
-                >
-                  →
-                </button>
-              </div>
-            )}
+              {pages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  {/* First page */}
+                  {page > 3 && (
+                    <>
+                      <button onClick={() => setPage(1)}
+                        className="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-500 hover:border-primary hover:text-primary transition-colors text-sm font-semibold">
+                        1
+                      </button>
+                      {page > 4 && <span className="text-slate-400 text-sm">...</span>}
+                    </>
+                  )}
+
+                  {/* Prev button */}
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:border-primary hover:text-primary transition-colors text-sm"
+                  >
+                    ←
+                  </button>
+
+                  {/* Page numbers — sliding window of 3 around current page */}
+                  {Array.from({ length: pages }, (_, i) => i + 1)
+                    .filter(p => p >= page - 1 && p <= page + 1)
+                    .map(p => (
+                      <button
+                        key={p}
+                        onClick={() => setPage(p)}
+                        className={`w-9 h-9 rounded-xl border text-sm font-semibold transition-all duration-200 ${
+                          page === p
+                            ? 'bg-primary text-white border-primary'
+                            : 'bg-white text-slate-500 border-slate-200 hover:border-primary hover:text-primary'
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))
+                  }
+
+                  {/* Next button */}
+                  <button
+                    onClick={() => setPage(p => Math.min(pages, p + 1))}
+                    disabled={page === pages}
+                    className="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:border-primary hover:text-primary transition-colors text-sm"
+                  >
+                    →
+                  </button>
+
+                  {/* Last page */}
+                  {page < pages - 2 && (
+                    <>
+                      {page < pages - 3 && <span className="text-slate-400 text-sm">...</span>}
+                      <button onClick={() => setPage(pages)}
+                        className="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-500 hover:border-primary hover:text-primary transition-colors text-sm font-semibold">
+                        {pages}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
           </>
         )}
       </PageWrapper>

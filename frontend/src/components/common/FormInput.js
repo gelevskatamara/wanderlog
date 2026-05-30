@@ -10,6 +10,11 @@ export default function FormInput({ label, error, required, className = '', ...p
       <input
         {...props}
         className={`form-input ${error ? 'border-red-400 focus:border-red-400' : ''} ${className}`}
+        onClick={e => {
+          if (props.type === 'date') {
+            e.target.showPicker?.();
+          }
+        }}
       />
       {error && <p className="form-error">{error}</p>}
     </div>

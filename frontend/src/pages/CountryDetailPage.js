@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/layout/PageHeader';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import FormInput from '../components/common/FormInput';
+import FormSelect from '../components/common/FormSelect';
 import FormTextarea from '../components/common/FormTextarea';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -22,11 +23,12 @@ export default function CountryDetailPage() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tripModal, setTripModal] = useState(false);
-  const [tripForm, setTripForm] = useState({ title: '', startDate: '', endDate: '', description: '' });
+  const [tripForm, setTripForm] = useState({ title: '', startDate: '', endDate: '', description: '', status: 'planned' });
   const [tripError, setTripError] = useState('');
   const [tripSaving, setTripSaving] = useState(false);
   const [tripSuccess, setTripSuccess] = useState(false);
   const { photo: countryPhoto } = useCountryPhoto(country?.name);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getCountry(decodeURIComponent(name))
@@ -42,9 +44,18 @@ export default function CountryDetailPage() {
   const handleTripSubmit = async (e) => {
     e.preventDefault();
     setTripError('');
-    if (!tripForm.title || tripForm.title.length < 3) { setTripError('Title must be at least 3 characters'); return; }
-    if (!tripForm.startDate || !tripForm.endDate) { setTripError('Both dates are required'); return; }
-    if (tripForm.endDate < tripForm.startDate) { setTripError('End date must be after start date'); return; }
+
+    const errs = [];
+    if (!tripForm.title || tripForm.title.length < 3) errs.push('Title must be at least 3 characters');
+    if (!tripForm.startDate) errs.push('Start date is required');
+    if (!tripForm.endDate) errs.push('End date is required');
+    if (tripForm.startDate && tripForm.endDate && tripForm.endDate < tripForm.startDate) errs.push('End date must be after start date');
+
+    if (errs.length > 0) {
+      setTripError(errs.join(' · '));
+      return;
+    }
+
     setTripSaving(true);
     try {
       await createTrip({ ...tripForm, destination: country.name });
@@ -87,6 +98,16 @@ export default function CountryDetailPage() {
         )}
       />
       <PageWrapper>
+
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-medium mb-4"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back to Countries
+        </button>
 
         {/* Hero banner with photo */}
         <div className="rounded-2xl sm:rounded-3xl overflow-hidden mb-6 relative h-48 sm:h-64 bg-gradient-to-br from-primary-light via-soft-purple to-soft-pink">
@@ -204,7 +225,7 @@ export default function CountryDetailPage() {
             <Alert type="error" message={tripError} />
             <FormInput
               label="Trip Title" name="title" type="text"
-              placeholder="e.g. Tokyo Cherry Blossom Trip"
+              placeholder="e.g. Albania Summer Escape"
               value={tripForm.title}
               onChange={e => setTripForm(p => ({ ...p, title: e.target.value }))}
               required
@@ -217,8 +238,17 @@ export default function CountryDetailPage() {
                 <FormInput label="End Date" name="endDate" type="date" value={tripForm.endDate} onChange={e => setTripForm(p => ({ ...p, endDate: e.target.value }))} required />
               </div>
             </div>
+            <FormSelect
+              label="Status" name="status" value={tripForm.status}
+              onChange={e => setTripForm(p => ({ ...p, status: e.target.value }))}
+            >
+              <option value="planned">Planned</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="completed">Completed</option>
+            </FormSelect>
             <FormTextarea
-              label="Notes" rows={3} placeholder="What are you excited about?"
+              label="Description" name="description" rows={3}
+              placeholder="What are you excited about?"
               value={tripForm.description} maxLength={500}
               onChange={e => setTripForm(p => ({ ...p, description: e.target.value }))}
             />
