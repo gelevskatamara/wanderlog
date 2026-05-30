@@ -204,9 +204,9 @@ export default function HomePage() {
 
           <div className="flex flex-row flex-wrap justify-center -mx-4">
             {[
-                { img: '/images/screenshots/explore-countries.png', title: 'Explore Countries', desc: 'Browse 250 countries with real-time weather, local info, currency, timezone, and more. Powered by REST Countries and OpenWeatherMap APIs.', overlay: '#636BAB' },
-                { img: '/images/screenshots/trip-details.png', title: 'Log Your Trips', desc: 'Log every trip — add dates, destinations, a description, and your personal status. Keep your travel history in one place and easily switch between planned, ongoing, and completed trips.', overlay: '#E4C2C6' },
-                { img: '/images/screenshots/trips.png', title: 'Review & Remember', desc: 'Rate and review every trip. Share your highlights, tips, and memories. Look back on every adventure with the detail it deserves.', overlay: '#CBC0D3' },
+                { img: '/images/screenshots/explore-countries.jpg', title: 'Explore Countries', desc: 'Browse 250 countries with real-time weather, local info, currency, timezone, and more. Powered by REST Countries and OpenWeatherMap APIs.', overlay: '#636BAB' },
+                { img: '/images/screenshots/trips.jpg', title: 'Log Your Trips', desc: 'Log every trip — add dates, destinations, a description, and your personal status. Keep your travel history in one place and easily switch between planned, ongoing, and completed trips.', overlay: '#E4C2C6' },
+                { img: '/images/screenshots/reviews.png', title: 'Review & Remember', desc: 'Rate and review every trip. Share your highlights, tips, and memories. Look back on every adventure with the detail it deserves.', overlay: '#CBC0D3' },
                 ].map(({ img, title, desc, overlay }) => (
                 <div key={title} className="w-full md:w-1/2 min-[1200px]:w-1/3 p-4">
                     <div className="w-full md:h-full block rounded-[20px] lg:rounded-[30px] shadow-lg relative overflow-hidden transition-all">
@@ -277,7 +277,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 right-1/2 md:-right-[90px] lg:-right-[150px] -translate-x-[calc(50%_+_40px)] md:translate-x-0 border-[3px] border-dashed border-l-transparent border-b-transparent border-r-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tr-[20px]" />
+                <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 right-1/2 md:-right-[90px] lg:-right-[150px] md:translate-x-0 border-[3px] border-dashed border-l-transparent border-b-transparent border-r-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tr-[20px]" />
               </div>
 
               {/* Item 2 — right */}
@@ -297,7 +297,7 @@ export default function HomePage() {
                       </div>
                     </div>
                   </div>
-                  <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 left-1/2 md:-left-[90px] lg:-left-[150px] -translate-x-[calc(50%_+_40px)] md:translate-x-0 border-[3px] border-dashed border-r-transparent border-b-transparent border-l-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tl-[20px]" />
+                  <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 left-1/2 md:-left-[90px] lg:-left-[150px] md:translate-x-0 border-[3px] border-dashed border-r-transparent border-b-transparent border-l-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tl-[20px]" />
                 </div>
               </div>
 
@@ -320,7 +320,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 right-1/2 md:-right-[90px] lg:-right-[150px] -translate-x-[calc(50%_+_40px)] md:translate-x-0 border-[3px] border-dashed border-l-transparent border-b-transparent border-r-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tr-[20px]" />
+                <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 right-1/2 md:-right-[90px] lg:-right-[150px]  md:translate-x-0 border-[3px] border-dashed border-l-transparent border-b-transparent border-r-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tr-[20px]" />
               </div>
 
               {/* Item 4 — right */}
@@ -357,41 +357,72 @@ export default function HomePage() {
         <div className="absolute top-0 left-0 w-64 h-64 bg-[#DEE2FF]/50 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#EFD3D7]/50 rounded-full blur-3xl" />
         <div className="max-w-[1420px] mx-auto px-5 relative z-10">
-          <div className="flex flex-row flex-wrap items-center -mx-5">
-            <div className="px-5 w-full lg:w-1/2 mb-10 lg:mb-0">
+          <div className="flex flex-row flex-wrap justify-center lg:justify-normal items-center -mx-5">
+            <div className="px-5 w-full lg:w-1/2 mb-10 lg:mb-0 text-center lg:text-left">
               <span className="text-xs uppercase tracking-widest text-[#636BAB] font-semibold bg-[#DEE2FF]/60 px-4 py-1.5 rounded-full inline-block mb-5">Everything you need</span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-800 leading-[115%] mb-6">
-                Your trips.<br/>Your memories.<br/><span className="text-[#636BAB]">Your world.</span>
+                Your trips.<span className="block min-[480px]:inline lg:block">Your memories.</span><span className="block min-[480px]:inline lg:block text-[#636BAB]">Your world.</span>
               </h2>
-              <p className="text-base text-slate-500 leading-relaxed mb-8 max-w-md">
+              <p className="text-base text-slate-500 leading-relaxed md-3 lg:mb-8 lg:max-w-md">
                 WanderLog brings together everything a traveller needs — real country data, live weather, a personal trip journal, and a clean dashboard to track it all.
               </p>
             </div>
             <div className="px-5 w-full lg:w-1/2">
-              <div className="flex flex-col -mt-4">
-                {[
-                  { bg: 'from-[#DEE2FF] to-[#636BAB]/30', title: 'Live Weather per Country', desc: 'Check real-time weather for any destination before you plan. Powered by OpenWeatherMap.' },
-                  { bg: 'from-[#EFD3D7] to-[#CBC0D3]', title: '195 Countries to Explore', desc: 'Rich country profiles with capitals, languages, currencies, timezones and borders.' },
-                  { bg: 'from-[#CBC0D3] to-[#DEE2FF]', title: 'Personal Travel Dashboard', desc: 'Visualise your travel history with charts showing regions visited, trips per year, and more.' },
-                ].map(({ bg, title, desc }) => (
-                  <div key={title} className="mt-4 flex flex-row flex-wrap items-start -mx-3 p-5 rounded-2xl hover:bg-white transition-all duration-300 hover:shadow-sm">
-                    <div className="px-3">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bg} flex items-center justify-center text-lg`}>
-                        <svg width="20" height="15" viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="fill-slate-800">
-                          <path d="M6.02 0H4.98C3.39 0 2.75 0.6 2.75 2.12V14H8.25V2.12C8.24 0.6 7.6 0 6.02 0Z"/>
-                          <path opacity="0.4" d="M14.52 5H13.48C11.89 5 11.25 5.61 11.25 7.12V14H16.75V7.12C16.75 5.61 16.1 5 14.52 5Z"/>
-                          <path d="M0.75 13.2578H19.25C19.66 13.2578 20 13.5978 20 14.0078C20 14.4178 19.66 14.7578 19.25 14.7578H0.75C0.34 14.7578 0 14.4178 0 13.9978C0 13.5778 0.34 13.2578 0.75 13.2578Z"/>
+                <div className="flex flex-col -mt-4">
+                    {[
+                    {
+                        bg: 'from-[#DEE2FF] to-[#636BAB]/30',
+                        title: 'Live Weather per Country',
+                        desc: 'Check real-time weather for any destination before you plan. Powered by OpenWeatherMap.',
+                        icon: (
+                        <svg width="20" height="17" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.4" d="M18.6 7.03748C17.83 6.11748 16.84 5.51748 15.69 5.25748C15.43 4.09748 14.98 3.09748 14.32 2.26748C14.3 2.23748 14.28 2.20748 14.26 2.18748C12.06 -0.472518 8.46 -0.462518 6.03 0.917482C3.95 2.10748 2.18 4.61748 3.11 8.19748C0.98 8.71748 0 10.5775 0 12.2575C0 14.1375 1.23 16.2475 3.97 16.4475H14.31C14.32 16.4475 14.34 16.4475 14.35 16.4475C15.77 16.4475 17.13 15.9175 18.18 14.9575C20.69 12.7375 20.36 9.11748 18.6 7.03748Z" fill="#292D32"/>
+                            <path d="M19.7492 4.94875C19.7492 5.84875 19.4292 6.70875 18.8492 7.36875C18.7792 7.25875 18.6892 7.14875 18.5992 7.03875C17.8392 6.12875 16.8392 5.50875 15.6892 5.25875C15.4392 4.09875 14.9792 3.10875 14.3192 2.27875C14.3092 2.24875 14.2792 2.21875 14.2592 2.19875C14.1592 2.07875 14.0492 1.96875 13.9492 1.85875C14.5592 1.43875 15.2592 1.21875 16.0192 1.21875C18.0792 1.21875 19.7492 2.88875 19.7492 4.94875Z" fill="#292D32"/>
                         </svg>
-                      </div>
+                        ),
+                    },
+                    {
+                        bg: 'from-[#EFD3D7] to-[#CBC0D3]',
+                        title: '195 Countries to Explore',
+                        desc: 'Rich country profiles with capitals, languages, currencies, timezones and borders.',
+                        icon: (
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.6" d="M8.10999 2C8.02999 2.3 8 2.63 8 3V6H3V4C3 2.9 3.9 2 5 2H8.10999Z" fill="#292D32"/>
+                            <path d="M8 17V6H3C1 6 0 7 0 9V17C0 19 1 20 3 20H11C9 20 8 19 8 17ZM4.75 15C4.75 15.41 4.41 15.75 4 15.75C3.59 15.75 3.25 15.41 3.25 15V11C3.25 10.59 3.59 10.25 4 10.25C4.41 10.25 4.75 10.59 4.75 11V15Z" fill="#292D32"/>
+                            <path opacity="0.4" d="M12 20H11C9 20 8 19 8 17V3C8 1 9 0 11 0H17C19 0 20 1 20 3V17C20 19 19 20 17 20H16" fill="#292D32"/>
+                            <path d="M16 16V20H12V16C12 15.45 12.45 15 13 15H15C15.55 15 16 15.45 16 16Z" fill="#292D32"/>
+                            <path d="M12 11.75C11.59 11.75 11.25 11.41 11.25 11V6C11.25 5.59 11.59 5.25 12 5.25C12.41 5.25 12.75 5.59 12.75 6V11C12.75 11.41 12.41 11.75 12 11.75Z" fill="#292D32"/>
+                            <path d="M16 11.75C15.59 11.75 15.25 11.41 15.25 11V6C15.25 5.59 15.59 5.25 16 5.25C16.41 5.25 16.75 5.59 16.75 6V11C16.75 11.41 16.41 11.75 16 11.75Z" fill="#292D32"/>
+                        </svg>
+                        ),
+                    },
+                    {
+                        bg: 'from-[#CBC0D3] to-[#DEE2FF]',
+                        title: 'Personal Travel Dashboard',
+                        desc: 'Visualise your travel history with charts showing regions visited, trips per year, and more.',
+                        icon: (
+                        <svg width="20" height="15" viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="fill-slate-800">
+                            <path d="M6.02 0H4.98C3.39 0 2.75 0.6 2.75 2.12V14H8.25V2.12C8.24 0.6 7.6 0 6.02 0Z"/>
+                            <path opacity="0.4" d="M14.52 5H13.48C11.89 5 11.25 5.61 11.25 7.12V14H16.75V7.12C16.75 5.61 16.1 5 14.52 5Z"/>
+                            <path d="M0.75 13.2578H19.25C19.66 13.2578 20 13.5978 20 14.0078C20 14.4178 19.66 14.7578 19.25 14.7578H0.75C0.34 14.7578 0 14.4178 0 13.9978C0 13.5778 0.34 13.2578 0.75 13.2578Z"/>
+                        </svg>
+                        ),
+                    },
+                    ].map(({ bg, title, desc, icon }) => (
+                    <div key={title} className="mt-4 flex flex-row flex-wrap items-start -mx-3 p-5 rounded-2xl hover:bg-white transition-all duration-300 hover:shadow-sm">
+                        <div className="px-3">
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bg} flex items-center justify-center`}>
+                            {icon}
+                        </div>
+                        </div>
+                        <div className="px-3 flex-1">
+                        <div className="font-bold text-slate-800 mb-1">{title}</div>
+                        <div className="text-sm text-slate-500 leading-relaxed">{desc}</div>
+                        </div>
                     </div>
-                    <div className="px-3 flex-1">
-                      <div className="font-bold text-slate-800 mb-1">{title}</div>
-                      <div className="text-sm text-slate-500 leading-relaxed">{desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                    ))}
+                </div>
+                </div>
           </div>
         </div>
       </section>
@@ -402,11 +433,11 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl mb-10 md:mb-14 text-center text-stone-800 leading-[120%] font-bold">Popular destinations</h2>
           <div className="flex flex-row flex-wrap justify-center -mx-3 -mt-6">
             {[
-              { img: '/images/destinations/japan', name: 'Japan', trips: '342 trips logged' },
-              { img: '/images/destinations/italy', name: 'Italy', trips: '298 trips logged' },
-              { img: '/images/destinations/greece', name: 'Greece', trips: '241 trips logged' },
-              { img: '/images/destinations/thailand', name: 'Thailand', trips: '198 trips logged' },
-            ].map(({ img, name, trips }) => (
+              { img: '/images/destinations/japan', name: 'Japan'},
+              { img: '/images/destinations/italy', name: 'Italy'},
+              { img: '/images/destinations/greece', name: 'Greece'},
+              { img: '/images/destinations/thailand', name: 'Thailand'},
+            ].map(({ img, name }) => (
               <div key={name} className="px-3 mt-6 w-full min-[480px]:w-1/2 lg:w-1/4">
                 <div className="block rounded-[24px] overflow-hidden relative h-[220px] hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   <picture>
@@ -416,7 +447,6 @@ export default function HomePage() {
                   <div className="absolute inset-0 bg-black/20 hover:bg-black/30 transition-all duration-300" />
                   <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-gradient-to-t from-black/60 to-transparent">
                     <div className="text-white font-bold text-lg">{name}</div>
-                    <div className="text-white/70 text-xs">{trips}</div>
                   </div>
                   <Link to="/login" className="absolute inset-0 z-50" aria-label={`Explore ${name}`} />
                 </div>
@@ -434,7 +464,7 @@ export default function HomePage() {
       {/* Footer CTA + Footer */}
       <div className="relative block w-full md:mt-10">
         <div className="w-full relative overflow-hidden before:bottom-0 before:absolute before:left-0 before:h-[150px] before:w-full before:bg-slate-800 before:content-['']">
-          <div className="w-[1080px] px-5 md:px-0 max-w-full mx-auto bg-[#636BAB] md:rounded-b-3xl min-[1080px]:rounded-[32px] h-auto py-10 md:py-0 md:h-[400px] relative z-20 flex items-center justify-center">
+          <div className="w-[1080px] px-5 md:px-0 max-w-full mx-auto bg-[#636BAB] lg:rounded-b-3xl min-[1080px]:rounded-[32px] h-auto py-10 md:py-0 md:h-[400px] relative z-20 flex items-center justify-center">
             <svg className="absolute z-10 w-auto h-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" width="1121" height="501" viewBox="0 0 1121 501" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path opacity="0.2" d="M12.5922 103.333C125.391 83.7243 322.904 94.1766 500.9 -105.895C674.758 -301.317 75.9235 30.0528 73.8309 258.664C71.3848 525.896 1061.67 -106.07 840.986 -91.4149C717.52 -83.2158 143.859 402.441 267.314 489.537C424.364 600.333 1133.49 114.939 1107.05 34.98C1060.4 -106.079 263.811 565.906 364.638 699.757C484.868 859.365 1041.93 464.994 1051.88 325.206C1059.83 213.375 540.153 715.656 719.493 960.136" stroke="white" strokeWidth="25" strokeLinecap="round"/>
             </svg>
