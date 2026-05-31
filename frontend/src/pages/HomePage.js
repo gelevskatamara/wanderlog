@@ -188,10 +188,11 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+        <div id="how-it-works"></div>
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="w-full relative block py-10 sm:py-16 md:py-20 overflow-hidden">
+      <section className="w-full relative block py-10 sm:py-16 md:py-20 overflow-hidden">
         <div className="max-w-[1420px] mx-auto px-5 relative">
           <h2 className="text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl mb-10 md:mb-14 xl:mb-16 text-center text-stone-800 leading-[120%] font-black w-full">
             <span className="relative pr-6">
@@ -350,10 +351,11 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+        <div id="features"></div>
       </section>
 
       {/* Features */}
-      <section id="features" className="w-full relative block py-10 sm:py-16 md:py-20 overflow-hidden bg-slate-50">
+      <section className="w-full relative block py-10 sm:py-16 md:py-20 overflow-hidden bg-slate-50">
         <div className="absolute top-0 left-0 w-64 h-64 bg-[#DEE2FF]/50 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#EFD3D7]/50 rounded-full blur-3xl" />
         <div className="max-w-[1420px] mx-auto px-5 relative z-10">
@@ -425,10 +427,11 @@ export default function HomePage() {
                 </div>
           </div>
         </div>
+        <div id="destinations"></div>
       </section>
 
       {/* Popular destinations */}
-      <section id="destinations" className="w-full relative block py-10 sm:py-16 md:py-20 overflow-hidden">
+      <section className="w-full relative block py-10 sm:py-16 md:py-20 overflow-hidden">
         <div className="max-w-[1420px] mx-auto px-5">
           <h2 className="text-3xl md:text-4xl lg:text-5xl mb-10 md:mb-14 text-center text-stone-800 leading-[120%] font-bold">Popular destinations</h2>
           <div className="flex flex-row flex-wrap justify-center -mx-3 -mt-6">
