@@ -13,7 +13,25 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000', credentials: true }));
+app.use(cors({
+  origin: function(origin, callback) {
+    const allowed = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.CLIENT_URL,
+    ].filter(Boolean);
+    
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
