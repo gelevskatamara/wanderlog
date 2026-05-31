@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply font-urbanist bg-soft-blue;
+    @apply font-urbanist bg-soft-blue overflow-x-hidden;
   }
 }
 
