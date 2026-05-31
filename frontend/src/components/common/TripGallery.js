@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import ConfirmModal from "./ConfirmModal";
 import { DeleteIcon } from "./Icons";
 
-const API_BASE = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_URL?.replace("/api", "") || "https://wanderlog-production-bfcd.up.railway.app";
 
 export default function TripGallery({ trip }) {
   const { user } = useAuth();
