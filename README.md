@@ -228,7 +228,7 @@ All fields are validated on three levels: Mongoose schema, Express middleware, a
 |-------|-------|
 | Name | Letters and spaces only, min 2 characters |
 | Email | Valid email format (`\S+@\S+\.\S+`) |
-| Password | Minimum 6 characters |
+| Password | Minimum 8 characters |
 | Trip Title | Minimum 3 characters |
 | Destination | Letters and spaces only |
 | End Date | Must be on or after start date |

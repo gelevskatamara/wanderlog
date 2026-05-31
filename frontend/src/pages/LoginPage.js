@@ -10,7 +10,7 @@ import useForm from '../hooks/useForm';
 const validateLogin = (v) => {
   const e = {};
   if (!v.email || !/^\S+@\S+\.\S+$/.test(v.email)) e.email = 'Valid email required';
-  if (!v.password || v.password.length < 6) e.password = 'At least 6 characters';
+  if (!v.password || v.password.length < 8) e.password = 'At least 8 characters';
   return e;
 };
 
@@ -18,7 +18,7 @@ const validateRegister = (v) => {
   const e = {};
   if (!v.name || !/^[a-zA-Z\s]{2,}$/.test(v.name)) e.name = 'Name must be at least 2 letters';
   if (!v.email || !/^\S+@\S+\.\S+$/.test(v.email)) e.email = 'Valid email required';
-  if (!v.password || v.password.length < 6) e.password = 'At least 6 characters';
+  if (!v.password || v.password.length < 8) e.password = 'At least 8 characters';
   if (v.password !== v.confirm) e.confirm = 'Passwords do not match';
   return e;
 };
@@ -153,7 +153,7 @@ export default function LoginPage() {
                 required
               />
               <FormInput
-                label="Password" name="password" type="password" placeholder="Min 6 characters"
+                label="Password" name="password" type="password" placeholder="Min 8 characters"
                 value={regForm.values.password}
                 onChange={regForm.handleChange}
                 onBlur={regForm.handleBlur}
