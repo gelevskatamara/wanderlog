@@ -95,13 +95,13 @@
   }
 
   /* Page header */
-  .page-header {
-    @apply bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-14 lg:top-0 z-40;
-  }
+    .page-header {
+    @apply bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between fixed top-14 lg:top-0 left-0 lg:left-64 right-0 z-40;
+    }
 
   /* Section/layout */
   .app-layout {
-    @apply flex min-h-screen bg-soft-blue font-urbanist;
+    @apply flex min-h-screen bg-soft-blue font-urbanist overflow-x-hidden;
   }
 
   .app-content {

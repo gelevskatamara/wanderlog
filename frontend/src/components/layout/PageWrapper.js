@@ -1,7 +1,7 @@
-export default function PageWrapper({ children, className = '' }) {
+export default function PageWrapper({ children }) {
   return (
-    <main className={`p-4 sm:p-6 lg:p-8 ${className}`}>
+    <div className="px-4 sm:px-6 py-4 sm:py-6 pt-24 sm:pt-20">
       {children}
-    </main>
+    </div>
   );
 }
