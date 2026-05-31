@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardIcon, ExploreIcon, TripsIcon, ProfileIcon, AdminIcon } from '../common/Icons';
 
-const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || 'https://wanderlog-production-bfcd.up.railway.app';
 
 const navItems = [
   { to: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },

@@ -3,7 +3,7 @@ import { uploadAvatar, removeAvatar } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import ConfirmModal from "./ConfirmModal";
 
-const API_BASE = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || 'https://wanderlog-production-bfcd.up.railway.app';
 
 export default function AvatarUpload() {
   const { user, setUser } = useAuth();
