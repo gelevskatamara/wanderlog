@@ -147,7 +147,7 @@ html {
     }
 
   .modal-backdrop {
-    @apply absolute inset-0 bg-black/40 backdrop-blur-sm;
+    @apply absolute inset-0 bg-black/40;
   }
 
   .modal-box {
