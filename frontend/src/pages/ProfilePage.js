@@ -106,7 +106,7 @@ export default function ProfilePage() {
               />
               <FormInput
                 label="New Password" name="newPassword" type="password"
-                placeholder="Min 6 characters"
+                placeholder="Min 8 characters"
                 value={pwForm.newPassword}
                 onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))}
                 required
