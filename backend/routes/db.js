@@ -87,9 +87,9 @@ router.get('/seed', async (req, res) => {
       success: true,
       message: 'Database seeded successfully',
       credentials: {
-        admin: { email: 'admin@wanderlog.com', password: 'admin123' },
-        user1: { email: 'alex@wanderlog.com', password: 'user123' },
-        user2: { email: 'maria@wanderlog.com', password: 'user123' },
+        admin: { email: 'admin@wanderlog.com', password: 'admin@1234' },
+        user1: { email: 'alex@wanderlog.com', password: 'user@1234' },
+        user2: { email: 'maria@wanderlog.com', password: 'user@1234' },
       },
     });
   } catch (err) {

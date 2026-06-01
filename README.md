@@ -149,9 +149,9 @@ After running `/db/seed`:
  
 | Email | Password | Role |
 |-------|----------|------|
-| admin@wanderlog.com | admin123 | Admin |
-| alex@wanderlog.com | user123 | User |
-| maria@wanderlog.com | user123 | User |
+| admin@wanderlog.com | admin@1234 | Admin |
+| alex@wanderlog.com | user@1234 | User |
+| maria@wanderlog.com | user@1234 | User |
  
 ---
  

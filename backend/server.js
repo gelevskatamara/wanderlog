@@ -18,6 +18,7 @@ app.use(cors({
     const allowed = [
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:5000',
       process.env.CLIENT_URL,
     ].filter(Boolean);
     

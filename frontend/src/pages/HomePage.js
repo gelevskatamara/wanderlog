@@ -92,7 +92,7 @@ export default function HomePage() {
 
       {/* Mobile drawer */}
       <div className={`lg:hidden fixed top-0 right-0 z-[5000] h-full w-72 bg-white flex flex-col shadow-2xl transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        {/* Drawer header — just close button, no logo */}
+        {/* Drawer header - just close button, no logo */}
         <div className="flex items-center justify-end px-4 py-4 border-b border-slate-100">
             <button
             onClick={() => setMobileOpen(false)}
@@ -156,7 +156,7 @@ export default function HomePage() {
                 Log your journeys, <span className="relative inline-block text-[#636BAB]">explore</span> the world
               </h1>
               <p className="text-base sm:text-lg min-[1440px]:text-xl leading-tight tracking-normal text-neutral-400 max-w-xl mx-auto relative mb-8">
-                Plan trips, track visited countries, log memories, and discover your next destination — all in one beautiful place.
+                Plan trips, track visited countries, log memories, and discover your next destination - all in one beautiful place.
               </p>
               <div className="flex flex-row flex-wrap items-center justify-center gap-3 -mx-2">
                 <div className="px-2">
@@ -206,18 +206,18 @@ export default function HomePage() {
           <div className="flex flex-row flex-wrap justify-center -mx-4">
             {[
                 { img: '/images/screenshots/explore-countries.jpg', title: 'Explore Countries', desc: 'Browse 250 countries with real-time weather, local info, currency, timezone, and more. Powered by REST Countries and OpenWeatherMap APIs.', overlay: '#636BAB' },
-                { img: '/images/screenshots/trips.jpg', title: 'Log Your Trips', desc: 'Log every trip — add dates, destinations, a description, and your personal status. Keep your travel history in one place and easily switch between planned, ongoing, and completed trips.', overlay: '#E4C2C6' },
+                { img: '/images/screenshots/trips.jpg', title: 'Log Your Trips', desc: 'Log every trip - add dates, destinations, a description, and your personal status. Keep your travel history in one place and easily switch between planned, ongoing, and completed trips.', overlay: '#E4C2C6' },
                 { img: '/images/screenshots/reviews.png', title: 'Review & Remember', desc: 'Rate and review every trip. Share your highlights, tips, and memories. Look back on every adventure with the detail it deserves.', overlay: '#CBC0D3' },
                 ].map(({ img, title, desc, overlay }) => (
                 <div key={title} className="w-full md:w-1/2 min-[1200px]:w-1/3 p-4">
                     <div className="w-full md:h-full block rounded-[20px] lg:rounded-[30px] shadow-lg relative overflow-hidden transition-all">
 
-                    {/* Image — always visible, fills the top */}
+                    {/* Image - always visible, fills the top */}
                     <div className="w-full h-[200px] min-[575px]:h-[280px] relative">
                         <img src={img} alt={title} className="object-cover object-top w-full h-full" />
                     </div>
 
-                    {/* Hover overlay — slides up from bottom on desktop */}
+                    {/* Hover overlay - slides up from bottom on desktop */}
                     <div
                         className="group hidden min-[575px]:flex flex-col absolute bottom-0 h-[30%] hover:h-[80%] left-0 w-full px-5 py-6 z-20 items-center justify-center rounded-[20px] lg:rounded-[30px] font-semibold text-2xl lg:text-3xl leading-[120%] transition-all duration-[950ms]"
                         style={{ backgroundColor: `${overlay}E6` }}
@@ -236,7 +236,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    {/* Mobile — static bottom bar */}
+                    {/* Mobile - static bottom bar */}
                     <div
                         className="flex flex-col min-[575px]:hidden px-5 py-6 justify-center rounded-b-[20px] font-semibold leading-[120%]"
                         style={{ backgroundColor: overlay }}
@@ -259,7 +259,7 @@ export default function HomePage() {
           <div className="w-full min-[1100px]:w-[1060px] lg:mx-auto">
             <div className="flex flex-col">
 
-              {/* Item 1 — left */}
+              {/* Item 1 - left */}
               <div className="w-full md:w-[630px] min-[865px]:w-[705px] lg:w-[755px] pb-[55px] lg:pb-[90px] relative">
                 <div className="rounded-[20px] border-[2.5px] border-[#636BAB] p-4 md:p-6 lg:py-8 lg:px-7 flex items-center">
                   <div className="pl-[60px] md:pl-[80px] lg:pl-[102px] relative flex flex-row items-center">
@@ -274,14 +274,14 @@ export default function HomePage() {
                     </div>
                     <div className="text-left text-slate-800 leading-tight">
                       <p className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl mb-1.5 md:mb-3 xl:mb-5 font-medium">One Place for Everything</p>
-                      <p className="text-sm md:text-base leading-[140%] text-neutral-500 font-light">No more jumping between apps, notes, and photos. Every trip, every country, every memory — organised and accessible whenever you need it.</p>
+                      <p className="text-sm md:text-base leading-[140%] text-neutral-500 font-light">No more jumping between apps, notes, and photos. Every trip, every country, every memory - organised and accessible whenever you need it.</p>
                     </div>
                   </div>
                 </div>
                 <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 right-1/2 md:-right-[90px] lg:-right-[150px] md:translate-x-0 border-[3px] border-dashed border-l-transparent border-b-transparent border-r-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tr-[20px]" />
               </div>
 
-              {/* Item 2 — right */}
+              {/* Item 2 - right */}
               <div className="flex flex-col items-end">
                 <div className="w-full md:w-[630px] min-[865px]:w-[705px] lg:w-[755px] pb-[55px] lg:pb-[90px] relative">
                   <div className="rounded-[20px] border-[2.5px] border-[#636BAB] p-4 md:p-6 lg:py-8 lg:px-7 flex items-center">
@@ -302,7 +302,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Item 3 — left */}
+              {/* Item 3 - left */}
               <div className="w-full md:w-[630px] min-[865px]:w-[705px] lg:w-[755px] pb-[55px] lg:pb-[90px] relative">
                 <div className="rounded-[20px] border-[2.5px] border-[#636BAB] p-4 md:p-6 lg:py-8 lg:px-7 flex items-center">
                   <div className="pl-[60px] md:pl-[80px] lg:pl-[102px] relative flex flex-row items-center">
@@ -324,7 +324,7 @@ export default function HomePage() {
                 <div className="w-[80px] lg:w-[110px] h-[35px] md:h-[50px] lg:h-[80px] absolute bottom-2.5 lg:bottom-7 right-1/2 md:-right-[90px] lg:-right-[150px]  md:translate-x-0 border-[3px] border-dashed border-l-transparent border-b-transparent border-r-[#CBC0D3] md:border-t-[#CBC0D3] border-t-transparent md:rounded-tr-[20px]" />
               </div>
 
-              {/* Item 4 — right */}
+              {/* Item 4 - right */}
               <div className="flex flex-col items-end">
                 <div className="w-full md:w-[630px] min-[865px]:w-[705px] lg:w-[755px] relative">
                   <div className="rounded-[20px] border-[2.5px] border-[#636BAB] p-4 md:p-6 lg:py-8 lg:px-7 flex items-center">
@@ -366,7 +366,7 @@ export default function HomePage() {
                 Your trips.<span className="block min-[480px]:inline lg:block">Your memories.</span><span className="block min-[480px]:inline lg:block text-[#636BAB]">Your world.</span>
               </h2>
               <p className="text-base text-slate-500 leading-relaxed md-3 lg:mb-8 lg:max-w-md">
-                WanderLog brings together everything a traveller needs — real country data, live weather, a personal trip journal, and a clean dashboard to track it all.
+                WanderLog brings together everything a traveller needs - real country data, live weather, a personal trip journal, and a clean dashboard to track it all.
               </p>
             </div>
             <div className="px-5 w-full lg:w-1/2">
@@ -474,7 +474,7 @@ export default function HomePage() {
             <div className="bg-white mx-auto rounded-xl w-[520px] max-w-full text-center relative z-30 px-6 py-10 sm:py-12">
               <div className="max-w-full w-[470px] mx-auto">
                 <h3 className="font-urbanist font-extrabold text-3xl sm:text-[38px] leading-tight -tracking-tight mb-4 text-slate-800">Start your travel journal today</h3>
-                <p className="text-slate-500 mb-8 text-base">Still have doubts? Don't hesitate to contact us — we'll walk you through everything WanderLog has to offer.</p>
+                <p className="text-slate-500 mb-8 text-base">Still have doubts? Don't hesitate to contact us - we'll walk you through everything WanderLog has to offer.</p>
                 <a href="mailto:info.wanderlog@gmail.com" className="inline-flex items-center gap-2 min-h-[38px] bg-[#636BAB] border border-[#636BAB] text-white rounded-[42px] px-5 py-2 transition-all duration-300 hover:bg-[#636BAB]/70 text-base font-medium">
                   Get in touch <ArrowIcon />
                 </a>

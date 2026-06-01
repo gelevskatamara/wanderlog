@@ -68,11 +68,11 @@ export default function LoginPage() {
           Log your journeys,<span className="block text-primary">explore the world</span>
         </h2>
         <p className="text-slate-500 text-center max-w-sm leading-relaxed">
-          Plan trips, discover 195 countries with live weather, and build your personal travel journal.
+          Plan trips, discover 250 countries with live weather, and build your personal travel journal.
         </p>
         {/* Stats */}
         <div className="flex gap-8 mt-4">
-          {[['1,200+', 'Travellers'], ['195', 'Countries'], ['4,800+', 'Trips']].map(([val, label]) => (
+          {[['1,200+', 'Travellers'], ['250', 'Countries'], ['4,800+', 'Trips']].map(([val, label]) => (
             <div key={label} className="text-center">
               <div className="text-2xl font-black text-primary">{val}</div>
               <div className="text-xs text-slate-500 mt-1">{label}</div>
