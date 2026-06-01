@@ -205,7 +205,7 @@ export default function TripDetailPage() {
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-soft-pink to-soft-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
                           {r.userId?.avatar
-                            ? <img src={`${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000'}${r.userId.avatar}`} alt="" className="w-full h-full object-cover" />
+                            ? <img src={`${process.env.REACT_APP_API_URL?.replace('/api', '') || 'https://wanderlog-production-bfcd.up.railway.app'}${r.userId.avatar}`} alt="" className="w-full h-full object-cover" />
                             : r.userId?.name?.[0]?.toUpperCase()
                           }
                         </div>
