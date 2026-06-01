@@ -18,7 +18,17 @@ const validateRegister = (v) => {
   const e = {};
   if (!v.name || !/^[a-zA-Z\s]{2,}$/.test(v.name)) e.name = 'Name must be at least 2 letters';
   if (!v.email || !/^\S+@\S+\.\S+$/.test(v.email)) e.email = 'Valid email required';
-  if (!v.password || v.password.length < 8) e.password = 'At least 8 characters';
+  if (!v.password) {
+    e.password = 'Password is required';
+  } else if (v.password.length < 8) {
+    e.password = 'At least 8 characters';
+  } else if (!/[A-Z]/.test(v.password)) {
+    e.password = 'Must contain at least one capital letter';
+  } else if (!/[0-9]/.test(v.password)) {
+    e.password = 'Must contain at least one number';
+  } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(v.password)) {
+    e.password = 'Must contain at least one special character (!@#$%^&*)';
+  }
   if (v.password !== v.confirm) e.confirm = 'Passwords do not match';
   return e;
 };

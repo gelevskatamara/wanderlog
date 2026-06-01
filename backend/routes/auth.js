@@ -96,7 +96,6 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
 
     const token = signToken(user._id);
-    // Login
     res.json({
       success: true,
       token,
@@ -189,6 +188,14 @@ router.put('/change-password', protect, async (req, res, next) => {
     await user.save();
     res.json({ success: true, message: 'Password updated successfully' });
   } catch (err) { next(err); }
+});
+
+
+router.get('/test-password', async (req, res) => {
+  const bcrypt = require('bcryptjs');
+  const hash = await bcrypt.hash('Admin@1234', 10);
+  const match = await bcrypt.compare('Admin@1234', hash);
+  res.json({ hash, match });
 });
 
 module.exports = router;

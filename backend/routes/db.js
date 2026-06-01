@@ -64,19 +64,19 @@ router.get('/seed', async (req, res) => {
     ]);
 
     // Create users
-    const admin = await User.create({ name: 'Admin User', email: 'admin@wanderlog.com', password: 'admin123', role: 'admin' });
-    const user1 = await User.create({ name: 'Alex Johnson', email: 'alex@wanderlog.com', password: 'user123', role: 'user' });
-    const user2 = await User.create({ name: 'Maria Smith', email: 'maria@wanderlog.com', password: 'user123', role: 'user' });
+    const admin = await User.create({ name: 'Admin User', email: 'admin@wanderlog.com', password: 'Admin@1234', role: 'admin' });
+    const user1 = await User.create({ name: 'Alex Johnson', email: 'alex@wanderlog.com', password: 'User@1234', role: 'user' });
+    const user2 = await User.create({ name: 'Maria Smith', email: 'maria@wanderlog.com', password: 'Guest@1234', role: 'guest' });
 
     // Create trips
     const trip1 = await Trip.create({ title: 'Tokyo & Kyoto Adventure', destination: 'Japan', startDate: new Date('2025-03-15'), endDate: new Date('2025-03-28'), description: 'Cherry blossoms and neon lights.', status: 'planned', userId: user1._id });
     const trip2 = await Trip.create({ title: 'Greek Islands Hopping', destination: 'Greece', startDate: new Date('2024-08-10'), endDate: new Date('2024-08-22'), description: 'Santorini, Mykonos, and Crete.', status: 'completed', userId: user1._id });
-    const trip3 = await Trip.create({ title: 'Italian Food & Culture', destination: 'Italy', startDate: new Date('2024-06-05'), endDate: new Date('2024-06-15'), description: 'Rome, Florence, and Venice.', status: 'completed', userId: user2._id });
-    const trip4 = await Trip.create({ title: 'Lisbon Long Weekend', destination: 'Portugal', startDate: new Date('2025-05-02'), endDate: new Date('2025-05-06'), description: 'Pasteis de nata and fado music.', status: 'planned', userId: user2._id });
+    const trip3 = await Trip.create({ title: 'Italian Food & Culture', destination: 'Italy', startDate: new Date('2024-06-05'), endDate: new Date('2024-06-15'), description: 'Rome, Florence, and Venice.', status: 'completed', userId: user1._id });
+    const trip4 = await Trip.create({ title: 'Lisbon Long Weekend', destination: 'Portugal', startDate: new Date('2025-05-02'), endDate: new Date('2025-05-06'), description: 'Pasteis de nata and fado music.', status: 'planned', userId: user1._id });
 
     // Create reviews
     await Review.create({ rating: 5, comment: 'Absolutely breathtaking. Greece exceeded every expectation!', userId: user1._id, tripId: trip2._id });
-    await Review.create({ rating: 5, comment: 'Rome is a living museum. The pasta alone was worth the flight.', userId: user2._id, tripId: trip3._id });
+    await Review.create({ rating: 4, comment: 'Rome is a living museum. The pasta alone was worth the flight.', userId: admin._id, tripId: trip3._id });
 
     // Create notifications
     await Notification.create({ userId: user1._id, message: 'Welcome to WanderLog, Alex!', type: 'welcome' });
@@ -87,9 +87,9 @@ router.get('/seed', async (req, res) => {
       success: true,
       message: 'Database seeded successfully',
       credentials: {
-        admin: { email: 'admin@wanderlog.com', password: 'admin@1234' },
-        user1: { email: 'alex@wanderlog.com', password: 'user@1234' },
-        user2: { email: 'maria@wanderlog.com', password: 'user@1234' },
+        admin: { email: 'admin@wanderlog.com', password: 'Admin@1234' },
+        user1: { email: 'alex@wanderlog.com', password: 'User@1234' },
+        user2: { email: 'maria@wanderlog.com', password: 'Guest@1234' },
       },
     });
   } catch (err) {
