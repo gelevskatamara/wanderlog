@@ -76,7 +76,7 @@ router.get('/seed', async (req, res) => {
 
     // Create reviews
     await Review.create({ rating: 5, comment: 'Absolutely breathtaking. Greece exceeded every expectation!', userId: user1._id, tripId: trip2._id });
-    await Review.create({ rating: 4, comment: 'Rome is a living museum. The pasta alone was worth the flight.', userId: admin._id, tripId: trip3._id });
+    await Review.create({ rating: 4, comment: 'Rome is a living museum. The pasta alone was worth the flight.', userId: user1._id, tripId: trip3._id });
 
     // Create notifications
     await Notification.create({ userId: user1._id, message: 'Welcome to WanderLog, Alex!', type: 'welcome' });
